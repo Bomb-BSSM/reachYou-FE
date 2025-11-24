@@ -5,8 +5,15 @@ export const Container = styled.div`
   height: 100vh;
   background: ${({ theme }) => theme.colors.background};
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 80px;
 `;
 export const LogoImg = styled.img``;
-export const ButtonArea = styled.div``;
+export const ButtonArea = styled.div`
+  display: flex;
+  width: 560px;
+  flex-direction: column;
+  gap: 12px;
+`;

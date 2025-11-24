@@ -16,4 +16,11 @@ export const Button = styled.button`
   font-style: normal;
   font-weight: 600;
   line-height: normal;
+
+  transition: all 0.2s ease;
+
+  &:hover {
+    border: 1px solid ${({ theme }) => theme.colors.primary};
+    filter: brightness(0.9);
+  }
 `;
