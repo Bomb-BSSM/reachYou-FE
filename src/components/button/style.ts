@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Button = styled.button`
+export const Button = styled.button<{ type: string }>`
   display: inline-flex;
   padding: 10px 20px;
   justify-content: center;
@@ -23,4 +23,7 @@ export const Button = styled.button`
     border: 1px solid ${({ theme }) => theme.colors.primary};
     filter: brightness(0.9);
   }
+  ${props =>
+    props.type == 'pink' &&
+    `color: ${props.theme.colors.primary}; background: ${props.theme.colors.secondary}`}
 `;

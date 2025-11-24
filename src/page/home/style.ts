@@ -10,7 +10,9 @@ export const Container = styled.div`
   align-items: center;
   gap: 80px;
 `;
-export const LogoImg = styled.img``;
+export const LogoImg = styled.img`
+  height: 187px;
+`;
 export const ButtonArea = styled.div`
   display: flex;
   width: 560px;
