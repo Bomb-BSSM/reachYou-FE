@@ -17,6 +17,21 @@ declare module 'styled-components' {
         medium: string;
         large: string;
       };
+      weight: {
+        regular: number;
+        medium: number;
+        bold: number;
+      };
+      style: {
+        normal: string;
+        italic: string;
+      };
+
+      lineHeight: {
+        normal: string;
+        tight: string;
+        relaxed: string;
+      };
     };
     spacing: {
       small: string;

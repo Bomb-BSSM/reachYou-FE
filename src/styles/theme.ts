@@ -2,21 +2,40 @@ import type { DefaultTheme } from 'styled-components';
 
 export const theme: DefaultTheme = {
   colors: {
-    primary: '#007bff',
-    secondary: '#6c757d',
-    background: '#ffffff',
-    text: '#212529',
+    primary: '#FF88BB',
+    secondary: '#FFDFEC',
+    background: '#FFD0E2',
+    text: '#1C1B1D',
     error: '#dc3545',
     success: '#28a745',
   },
+
   fonts: {
-    main: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    main: '"S-Core Dream", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
     size: {
-      small: '0.875rem',
-      medium: '1rem',
-      large: '1.25rem',
+      small: '14px',
+      medium: '16px',
+      large: '20px',
+    },
+
+    weight: {
+      regular: 400,
+      medium: 500,
+      bold: 700,
+    },
+
+    style: {
+      normal: 'normal',
+      italic: 'italic',
+    },
+
+    lineHeight: {
+      normal: 'normal',
+      tight: '1.2',
+      relaxed: '1.6',
     },
   },
+
   spacing: {
     small: '0.5rem',
     medium: '1rem',
