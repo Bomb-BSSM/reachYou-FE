@@ -8,5 +8,5 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
 export const LogoImg = styled.img``;
+export const ButtonArea = styled.div``;
