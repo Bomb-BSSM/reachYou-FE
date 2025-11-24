@@ -4,7 +4,7 @@ export const theme: DefaultTheme = {
   colors: {
     primary: '#FF88BB',
     secondary: '#FFDFEC',
-    background: '#FFD0E2',
+    background: 'radial-gradient(50% 50% at 50% 50%, #FFD0E2 0%, #FFF 100%)',
     text: '#1C1B1D',
     error: '#dc3545',
     success: '#28a745',
