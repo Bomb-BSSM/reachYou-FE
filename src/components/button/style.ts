@@ -8,7 +8,7 @@ export const Button = styled.button<{ type: string }>`
   gap: 10px;
   border-radius: 4px;
   border: 1px solid ${({ theme }) => theme.colors.primary};
-  background: #fff;
+  background: ${({ theme }) => theme.colors.white};
 
   color: ${({ theme }) => theme.colors.primary};
   font-family: Paperlogy;
@@ -18,12 +18,17 @@ export const Button = styled.button<{ type: string }>`
   line-height: normal;
 
   transition: all 0.2s ease;
+  cursor: pointer;
 
   &:hover {
-    border: 1px solid ${({ theme }) => theme.colors.primary};
     filter: brightness(0.9);
   }
+
   ${props =>
-    props.type == 'pink' &&
-    `color: ${props.theme.colors.primary}; background: ${props.theme.colors.secondary}`}
+    props.type === 'pink' &&
+    `background: ${props.theme.colors.secondary};`}
+
+  ${props =>
+    props.type === 'white' &&
+    `background: ${props.theme.colors.white};`}
 `;

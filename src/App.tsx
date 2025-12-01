@@ -1,7 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './page/home';
 import DestinyFinder from './page/destinyFinder';
+import Compatibility from './page/compatibility';
 
 const App: React.FC = () => {
   return (
@@ -9,6 +10,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/destiny-finder" element={<DestinyFinder />} />
+        <Route path="/compatibility" element={<Compatibility />} />
       </Routes>
     </BrowserRouter>
   );

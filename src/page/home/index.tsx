@@ -10,11 +10,11 @@ const Home: React.FC = () => {
     <_.Container>
       <_.LogoImg src={Logo} alt="로고 이미지" />
       <_.ButtonArea>
+        <Button body="궁합 보기" onClick={() => navigation('/compatibility')} />
         <Button
-          body="궁합 보기"
+          body="운명 찾기"
           onClick={() => navigation('/destiny-finder')}
         />
-        <Button body="운명 찾기" />
         <Button body="커플 랭킹" />
       </_.ButtonArea>
     </_.Container>

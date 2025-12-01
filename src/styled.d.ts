@@ -5,7 +5,13 @@ declare module 'styled-components' {
     colors: {
       primary: string;
       secondary: string;
+      primary500: string;
+      g200: string;
+      g400: string;
+      g500: string;
       background: string;
+      white: string;
+      black: string;
       text: string;
       error: string;
       success: string;

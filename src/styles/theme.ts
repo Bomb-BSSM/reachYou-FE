@@ -2,9 +2,15 @@ import type { DefaultTheme } from 'styled-components';
 
 export const theme: DefaultTheme = {
   colors: {
-    primary: '#FF88BB',
-    secondary: '#FFDFEC',
-    background: 'radial-gradient(50% 50% at 50% 50%, #FFD0E2 0%, #FFF 100%)',
+    primary: '#F97A9F', // primary700
+    secondary: '#FFDFEC', // primary300
+    primary500: '#FEBFDA',
+    g200: '#D9D9D9',
+    g400: '#AAA4AF',
+    g500: '#7C7580',
+    background: 'radial-gradient(ellipse at 50% 50%, #FEDCE9 0%, #FFFFFF 100%)',
+    white: '#FFFFFF',
+    black: '#000000',
     text: '#1C1B1D',
     error: '#dc3545',
     success: '#28a745',
