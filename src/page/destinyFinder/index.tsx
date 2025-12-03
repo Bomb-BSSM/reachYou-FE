@@ -3,7 +3,8 @@ import * as _ from './style';
 import Button from '@/components/button';
 import Input from '@/components/input';
 import ProfileCard from '@/components/profileCard';
-import AddProfileIcon from '@/assets/AddProfileIcon';
+import AddProfileIcon from '@/assets/profileAddImg.svg';
+import { useNavigate } from 'react-router-dom';
 
 interface Profile {
   id: number;
@@ -13,6 +14,7 @@ interface Profile {
 }
 
 const DestinyFinder: React.FC = () => {
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([
     { id: 1, name: '이원희', mbti: 'MBTI', imageUrl: undefined },
   ]);
@@ -32,12 +34,28 @@ const DestinyFinder: React.FC = () => {
     }
   };
 
-  const handleEditProfile = (id: number) => {
-    console.log('Edit profile:', id);
+  const handleEditProfile = (id: number, name: string, mbti: string) => {
+    setProfiles(
+      profiles.map(profile =>
+        profile.id === id ? { ...profile, name, mbti } : profile
+      )
+    );
+  };
+
+  const handleImageChange = (id: number, imageUrl: string) => {
+    setProfiles(
+      profiles.map(profile =>
+        profile.id === id ? { ...profile, imageUrl } : profile
+      )
+    );
   };
 
   const handleDeleteProfile = (id: number) => {
     setProfiles(profiles.filter(profile => profile.id !== id));
+  };
+
+  const handleNext = () => {
+    navigate('/destiny-finder/list', { state: { profiles } });
   };
 
   return (
@@ -50,20 +68,18 @@ const DestinyFinder: React.FC = () => {
               운명찾기를 진행할 사람의 정보를 입력해 주세요.
             </_.HeaderText>
           </_.HeaderTextArea>
-          <Button body="다음으로" type="pink" />
+          <Button body="다음으로" type="pink" onClick={handleNext} />
         </_.HeaderArea>
 
         <_.MainContentDiv>
           <_.AddProfileDiv>
             <_.ProfileHeadText>
               <_.ProfileHeadTitle>프로필 작성</_.ProfileHeadTitle>
-              <_.ProfileCount>
-                {profiles.length} / 10
-              </_.ProfileCount>
+              <_.ProfileCount>{profiles.length} / 8</_.ProfileCount>
             </_.ProfileHeadText>
 
             <_.AddProfileImageButton>
-              <AddProfileIcon />
+              <img src={AddProfileIcon} />
             </_.AddProfileImageButton>
 
             <_.InputArea>
@@ -91,7 +107,12 @@ const DestinyFinder: React.FC = () => {
                 name={profile.name}
                 mbti={profile.mbti}
                 imageUrl={profile.imageUrl}
-                onEdit={() => handleEditProfile(profile.id)}
+                onEdit={(name, mbti) =>
+                  handleEditProfile(profile.id, name, mbti)
+                }
+                onImageChange={(imageUrl) =>
+                  handleImageChange(profile.id, imageUrl)
+                }
                 onDelete={() => handleDeleteProfile(profile.id)}
               />
             ))}

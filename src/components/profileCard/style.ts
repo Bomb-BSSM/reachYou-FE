@@ -3,8 +3,8 @@ import styled from 'styled-components';
 export const Card = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 32px;
+  gap: 20px;
+  padding: 28px;
   background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.black};
   border-radius: 6px;
@@ -13,12 +13,18 @@ export const Card = styled.div`
 `;
 
 export const ProfileImage = styled.div`
-  width: 75px;
-  height: 75px;
+  width: 60px;
+  height: 60px;
   border-radius: 50px;
   overflow: hidden;
   background: ${({ theme }) => theme.colors.g400};
   position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    filter: brightness(0.9);
+  }
 `;
 
 export const ProfileImg = styled.img`
@@ -56,13 +62,14 @@ export const AvatarBody = styled.div`
 
 export const InfoSection = styled.div`
   display: flex;
-  gap: 15px;
+  gap: 12px;
   align-items: center;
+  width: 100%;
 `;
 
 export const Name = styled.p`
   font-family: 'Paperlogy', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-style: normal;
   font-weight: 600;
   line-height: normal;
@@ -71,15 +78,46 @@ export const Name = styled.p`
 
 export const Mbti = styled.p`
   font-family: 'Paperlogy', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-style: normal;
   font-weight: 600;
   line-height: normal;
   color: ${({ theme }) => theme.colors.black};
 `;
 
+export const EditInput = styled.input`
+  width: auto;
+  min-width: 50px;
+  max-width: 90px;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  color: ${({ theme }) => theme.colors.black};
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.g400};
+    font-weight: 400;
+  }
+
+  &:focus {
+    outline: none;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+export const HiddenFileInput = styled.input`
+  display: none;
+`;
+
 export const ButtonGroup = styled.div`
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 `;

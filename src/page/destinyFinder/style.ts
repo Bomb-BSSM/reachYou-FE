@@ -15,8 +15,8 @@ export const Container = styled.div`
 export const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 54px;
-  width: 842px;
+  gap: 48px;
+  width: 750px;
   align-items: flex-start;
 `;
 
@@ -36,10 +36,12 @@ export const HeaderTextArea = styled.div`
 
 export const HeaderText = styled.h3<{ color: string }>`
   color: ${props =>
-    props.color === 'pink' ? props.theme.colors.primary : props.theme.colors.black};
+    props.color === 'pink'
+      ? props.theme.colors.primary
+      : props.theme.colors.black};
   font-family: ${props =>
     props.color === 'pink' ? "'S-Core Dream'" : "'S-Core Dream'"};
-  font-size: 20px;
+  font-size: 18px;
   font-style: normal;
   font-weight: ${props => (props.color === 'pink' ? '700' : '500')};
   line-height: normal;
@@ -49,15 +51,15 @@ export const HeaderText = styled.h3<{ color: string }>`
 export const MainContentDiv = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 38px;
+  gap: 32px;
   width: 100%;
 `;
 
 export const AddProfileDiv = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 48px;
+  gap: 24px;
+  padding: 40px;
   background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.black};
   border-radius: 6px;
@@ -67,10 +69,10 @@ export const AddProfileDiv = styled.div`
 
 export const ProfileHeadText = styled.div`
   display: flex;
-  gap: 32px;
+  gap: 28px;
   align-items: flex-start;
   font-family: 'Paperlogy', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-style: normal;
   font-weight: 600;
   line-height: normal;
@@ -86,22 +88,25 @@ export const ProfileCount = styled.p`
 `;
 
 export const AddProfileImageButton = styled.button`
-  width: 75px;
-  height: 75px;
+  width: 60px;
+  height: 60px;
   padding: 0;
   border: none;
+  outline: none;
   background: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
     filter: brightness(0.9);
+    border: none;
+    outline: none;
   }
 `;
 
 export const InputArea = styled.div`
   display: flex;
-  gap: 48px;
+  gap: 40px;
   width: 100%;
 `;
 
@@ -115,7 +120,7 @@ export const ProfileCardGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: 20px;
+  gap: 16px;
   width: 100%;
-  height: 524px;
+  height: 460px;
 `;

@@ -8,21 +8,23 @@ export const InputWrapper = styled.div`
 
 export const Input = styled.input`
   width: 100%;
-  height: 50px;
-  padding: 14px;
+  height: 44px;
+  padding: 12px;
   border: none;
   border-bottom: 2px solid ${({ theme }) => theme.colors.primary};
   background: transparent;
 
   color: ${({ theme }) => theme.colors.black};
   font-family: 'HS산토끼체 2.0', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
 
   &::placeholder {
     color: ${({ theme }) => theme.colors.g500};
+    font-family: 'HS산토끼체 2.0', sans-serif;
+    font-weight: 300;
   }
 
   &:focus {

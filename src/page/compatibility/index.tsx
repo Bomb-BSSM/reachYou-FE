@@ -11,17 +11,17 @@ interface Profile {
 }
 
 const Compatibility: React.FC = () => {
-  const [selectedProfiles] = useState<Profile[]>([
+  const [selectedProfiles, setSelectedProfiles] = useState<Profile[]>([
     { id: 1, name: '이름', mbti: 'MBTI' },
     { id: 2, name: '이름', mbti: 'MBTI' },
   ]);
 
-  const handleEditProfile = (id: number) => {
-    console.log('Edit profile:', id);
-  };
-
-  const handleDeleteProfile = (id: number) => {
-    console.log('Delete profile:', id);
+  const handleEditProfile = (id: number, name: string, mbti: string) => {
+    setSelectedProfiles(
+      selectedProfiles.map(profile =>
+        profile.id === id ? { ...profile, name, mbti } : profile
+      )
+    );
   };
 
   const handleNext = () => {
@@ -47,8 +47,7 @@ const Compatibility: React.FC = () => {
                 name={profile.name}
                 mbti={profile.mbti}
                 imageUrl={profile.imageUrl}
-                onEdit={() => handleEditProfile(profile.id)}
-                onDelete={() => handleDeleteProfile(profile.id)}
+                onEdit={(name, mbti) => handleEditProfile(profile.id, name, mbti)}
               />
             </_.CardWrapper>
           ))}
