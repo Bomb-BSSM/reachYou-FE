@@ -24,6 +24,13 @@ const DestinyFinder = () => {
   const imgInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddProfile = () => {
+    if (profiles.length >= 8) {
+      alert('프로필의 최대 개수는 8개 입니다.');
+      setName('');
+      setMbti('');
+      setImageSrc('');
+      return;
+    }
     if (name && mbti) {
       const newProfile: Profile = {
         id: Date.now(),
