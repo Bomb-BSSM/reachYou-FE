@@ -22,13 +22,15 @@ export const Button = styled.button<{ type: string }>`
 
   &:hover {
     filter: brightness(0.9);
+    border: 1px solid ${({ theme }) => theme.colors.primary};
+  }
+  &:active {
+    outline: none;
   }
 
   ${props =>
-    props.type === 'pink' &&
-    `background: ${props.theme.colors.secondary};`}
+    props.type === 'pink' && `background: ${props.theme.colors.secondary};`}
 
   ${props =>
-    props.type === 'white' &&
-    `background: ${props.theme.colors.white};`}
+    props.type === 'white' && `background: ${props.theme.colors.white};`}
 `;

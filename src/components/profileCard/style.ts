@@ -87,8 +87,8 @@ export const Mbti = styled.p`
 
 export const EditInput = styled.input`
   width: auto;
-  min-width: 50px;
-  max-width: 90px;
+  min-width: 10px;
+  max-width: 50px;
   padding: 0;
   border: none;
   border-bottom: 1px solid transparent;
@@ -115,7 +115,7 @@ export const EditInput = styled.input`
 export const EditSelect = styled.select`
   width: auto;
   min-width: 50px;
-  max-width: 90px;
+  max-width: 54px;
   padding: 0;
   padding-right: 20px;
   border: none;

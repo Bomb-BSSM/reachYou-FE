@@ -52,9 +52,9 @@ const DestinyFinderList: React.FC = () => {
     <_.Container>
       <_.MainHeader>
         <_.HeaderTextArea>
-          <_.HeaderText color="pink">Q1.</_.HeaderText>
+          <_.HeaderText color="pink">Q2.</_.HeaderText>
           <_.HeaderText color="black">
-            운명찾기를 진행할 사람의 정보를 입력해 주세요.
+            운명찾기를 진행할 사람의 정보를 확인해 주세요.
           </_.HeaderText>
         </_.HeaderTextArea>
         <Button body="다음으로" type="pink" onClick={handleNext} />
