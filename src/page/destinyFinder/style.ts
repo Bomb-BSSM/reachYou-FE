@@ -87,7 +87,10 @@ export const ProfileCount = styled.p`
   color: ${({ theme }) => theme.colors.primary500};
 `;
 
-export const AddProfileImageButton = styled.button`
+export const HiddenInput = styled.input.attrs({ type: 'file' })`
+  display: none;
+`;
+export const AddProfileImageButton = styled.label`
   width: 60px;
   height: 60px;
   padding: 0;
@@ -96,12 +99,27 @@ export const AddProfileImageButton = styled.button`
   background: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
+  overflow: hidden;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     filter: brightness(0.9);
-    border: none;
-    outline: none;
   }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+export const ProfilePreviewImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 export const InputArea = styled.div`

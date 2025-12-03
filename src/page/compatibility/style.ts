@@ -85,7 +85,5 @@ export const NextButton = styled.div`
   button {
     width: 100%;
     padding: 12px 18px;
-    font-size: 18px;
-    border-width: 2px;
   }
 `;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useRef } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import Input from '@/components/input';
@@ -10,16 +10,16 @@ interface Profile {
   id: number;
   name: string;
   mbti: string;
-  imageUrl?: string;
+  imageUrl?: string | null;
 }
 
-const DestinyFinder: React.FC = () => {
+const DestinyFinder = () => {
   const navigate = useNavigate();
-  const [profiles, setProfiles] = useState<Profile[]>([
-    { id: 1, name: '이원희', mbti: 'MBTI', imageUrl: undefined },
-  ]);
+  const [imageSrc, setImageSrc] = useState<string>('');
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [name, setName] = useState('');
   const [mbti, setMbti] = useState('');
+  const imgInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddProfile = () => {
     if (name && mbti) {
@@ -27,10 +27,12 @@ const DestinyFinder: React.FC = () => {
         id: Date.now(),
         name,
         mbti,
+        imageUrl: imageSrc || null,
       };
       setProfiles([...profiles, newProfile]);
       setName('');
       setMbti('');
+      setImageSrc('');
     }
   };
 
@@ -42,12 +44,28 @@ const DestinyFinder: React.FC = () => {
     );
   };
 
-  const handleImageChange = (id: number, imageUrl: string) => {
+  const handleImageChange = (imageUrl: string, id?: number) => {
+    if (!id) {
+      setImageSrc(imageUrl);
+      return;
+    }
     setProfiles(
       profiles.map(profile =>
         profile.id === id ? { ...profile, imageUrl } : profile
       )
     );
+  };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.substring(0, 5) === 'image') {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageSrc(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImageSrc('');
+    }
   };
 
   const handleDeleteProfile = (id: number) => {
@@ -55,6 +73,10 @@ const DestinyFinder: React.FC = () => {
   };
 
   const handleNext = () => {
+    if (profiles.length < 3) {
+      alert('프로필 갯수는 최소 3개 이상입니다.');
+      return;
+    }
     navigate('/destiny-finder/list', { state: { profiles } });
   };
 
@@ -78,8 +100,18 @@ const DestinyFinder: React.FC = () => {
               <_.ProfileCount>{profiles.length} / 8</_.ProfileCount>
             </_.ProfileHeadText>
 
-            <_.AddProfileImageButton>
-              <img src={AddProfileIcon} />
+            <_.HiddenInput
+              id="profileImgUpload"
+              ref={imgInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+            />
+            <_.AddProfileImageButton htmlFor="profileImgUpload">
+              {imageSrc ? (
+                <_.ProfilePreviewImage src={imageSrc} alt="Profile preview" />
+              ) : (
+                <img src={AddProfileIcon} alt="Add profile" />
+              )}
             </_.AddProfileImageButton>
 
             <_.InputArea>
@@ -106,12 +138,12 @@ const DestinyFinder: React.FC = () => {
                 key={profile.id}
                 name={profile.name}
                 mbti={profile.mbti}
-                imageUrl={profile.imageUrl}
+                imageUrl={profile.imageUrl || undefined}
                 onEdit={(name, mbti) =>
                   handleEditProfile(profile.id, name, mbti)
                 }
-                onImageChange={(imageUrl) =>
-                  handleImageChange(profile.id, imageUrl)
+                onImageChange={imageUrl =>
+                  handleImageChange(imageUrl, profile.id)
                 }
                 onDelete={() => handleDeleteProfile(profile.id)}
               />
