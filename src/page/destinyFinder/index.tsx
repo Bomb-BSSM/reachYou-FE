@@ -120,6 +120,7 @@ const DestinyFinder = () => {
               <Input
                 placeholder="이름을 입력해주세요"
                 value={name}
+                maxlegth={5}
                 onChange={e => setName(e.target.value)}
               />
               <Select
