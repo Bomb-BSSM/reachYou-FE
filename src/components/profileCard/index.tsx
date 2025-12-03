@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import normalProfile from '@/assets/normalProfileImg.svg';
+import { MBTI_OPTIONS } from '@/utils/mbti';
 
 interface ProfileCardProps {
   name: string;
@@ -87,12 +88,16 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               onChange={e => setEditName(e.target.value)}
               placeholder="이름"
             />
-            <_.EditInput
-              type="text"
+            <_.EditSelect
               value={editMbti}
               onChange={e => setEditMbti(e.target.value)}
-              placeholder="MBTI"
-            />
+            >
+              {MBTI_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </_.EditSelect>
           </>
         ) : (
           <>

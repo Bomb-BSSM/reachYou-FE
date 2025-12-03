@@ -15,16 +15,16 @@ export const Input = styled.input`
   background: transparent;
 
   color: ${({ theme }) => theme.colors.black};
-  font-family: 'HS산토끼체 2.0', sans-serif;
+  font-family: ${({ theme }) => theme.fonts.main};
   font-size: 14px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
   line-height: normal;
 
   &::placeholder {
     color: ${({ theme }) => theme.colors.g500};
-    font-family: 'HS산토끼체 2.0', sans-serif;
-    font-weight: 300;
+    font-family: ${({ theme }) => theme.fonts.main};
+    font-weight: 500;
   }
 
   &:focus {

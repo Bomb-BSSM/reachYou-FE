@@ -112,6 +112,40 @@ export const EditInput = styled.input`
   }
 `;
 
+export const EditSelect = styled.select`
+  width: auto;
+  min-width: 50px;
+  max-width: 90px;
+  padding: 0;
+  padding-right: 20px;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  color: ${({ theme }) => theme.colors.black};
+
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23F97A9F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  cursor: pointer;
+
+  option {
+    background: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.black};
+  }
+
+  &:focus {
+    outline: none;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.primary};
+  }
+`;
+
 export const HiddenFileInput = styled.input`
   display: none;
 `;

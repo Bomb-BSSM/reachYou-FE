@@ -2,9 +2,11 @@ import { useState, useRef } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import Input from '@/components/input';
+import Select from '@/components/select';
 import ProfileCard from '@/components/profileCard';
 import AddProfileIcon from '@/assets/profileAddImg.svg';
 import { useNavigate } from 'react-router-dom';
+import { MBTI_OPTIONS } from '@/utils/mbti';
 
 interface Profile {
   id: number;
@@ -120,10 +122,11 @@ const DestinyFinder = () => {
                 value={name}
                 onChange={e => setName(e.target.value)}
               />
-              <Input
-                placeholder="MBTI를 입력해주세요"
+              <Select
+                placeholder="MBTI를 선택해주세요"
                 value={mbti}
                 onChange={e => setMbti(e.target.value)}
+                options={MBTI_OPTIONS}
               />
             </_.InputArea>
 
