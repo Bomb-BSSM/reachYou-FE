@@ -1,7 +1,6 @@
 import React from 'react';
 import * as _ from './style';
 import Logo from '@/assets/Logo.svg';
-import Button from '@/components/button';
 import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {
@@ -10,12 +9,13 @@ const Home: React.FC = () => {
     <_.Container>
       <_.LogoImg src={Logo} alt="로고 이미지" />
       <_.ButtonArea>
-        <Button body="궁합 보기" onClick={() => navigation('/compatibility')} />
-        <Button
-          body="운명 찾기"
-          onClick={() => navigation('/destiny-finder')}
-        />
-        <Button body="커플 랭킹" />
+        <_.Button onClick={() => navigation('/compatibility')}>
+          궁합 보기
+        </_.Button>
+        <_.Button onClick={() => navigation('/destiny-finder')}>
+          운명 찾기
+        </_.Button>
+        <_.Button>커플 랭킹</_.Button>
       </_.ButtonArea>
     </_.Container>
   );

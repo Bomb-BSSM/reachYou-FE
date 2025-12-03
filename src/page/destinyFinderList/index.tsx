@@ -21,16 +21,7 @@ const DestinyFinderList: React.FC = () => {
   const locationState = location.state as LocationState;
 
   const [profiles, setProfiles] = useState<Profile[]>(
-    locationState?.profiles || [
-      { id: 1, name: '이원희', mbti: 'MBTI', imageUrl: undefined },
-      { id: 2, name: '이민길', mbti: 'MBTI' },
-      { id: 3, name: '이민길', mbti: 'MBTI' },
-      { id: 4, name: '이민길', mbti: 'MBTI' },
-      { id: 5, name: '이민길', mbti: 'MBTI' },
-      { id: 6, name: '이민길', mbti: 'MBTI' },
-      { id: 7, name: '이민길', mbti: 'MBTI' },
-      { id: 8, name: '이민길', mbti: 'MBTI' },
-    ]
+    locationState?.profiles || []
   );
 
   const handleEditProfile = (id: number, name: string, mbti: string) => {
@@ -77,7 +68,7 @@ const DestinyFinderList: React.FC = () => {
             mbti={profile.mbti}
             imageUrl={profile.imageUrl}
             onEdit={(name, mbti) => handleEditProfile(profile.id, name, mbti)}
-            onImageChange={(imageUrl) => handleImageChange(profile.id, imageUrl)}
+            onImageChange={imageUrl => handleImageChange(profile.id, imageUrl)}
             onDelete={() => handleDeleteProfile(profile.id)}
           />
         ))}
