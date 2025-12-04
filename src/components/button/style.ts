@@ -20,12 +20,17 @@ export const Button = styled.button<{ type: string }>`
   transition: all 0.2s ease;
   cursor: pointer;
 
-  &:hover {
+  &:hover:not(:disabled) {
     filter: brightness(0.9);
     border: 1px solid ${({ theme }) => theme.colors.primary};
   }
   &:active {
     outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   ${props =>

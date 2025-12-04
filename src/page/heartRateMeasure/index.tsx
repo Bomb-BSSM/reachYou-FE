@@ -24,7 +24,7 @@ const HeartRateMeasure: React.FC = () => {
   const location = useLocation();
   const locationState = location.state as LocationState;
 
-  const [profiles] = useState<Profile[]>(locationState?.profiles || []);
+  const [profiles, setProfiles] = useState<Profile[]>(locationState?.profiles || []);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const [measurementStatus, setMeasurementStatus] = useState<MeasurementStatus>('idle');
   const [heartRate, setHeartRate] = useState(0);
@@ -62,30 +62,40 @@ const HeartRateMeasure: React.FC = () => {
   };
 
   const handleNext = () => {
-    if (currentProfileIndex < profiles.length - 1) {
-      setCurrentProfileIndex(currentProfileIndex + 1);
-      setMeasurementStatus('idle');
-      setHeartRate(0);
-      setTemperature(0);
-    } else {
-      // 모든 사용자 측정 완료
-      // compatibility 페이지에서 온 경우(2명)는 result로, destiny-finder에서 온 경우는 compatibility로
-      if (profiles.length === 2) {
-        navigate('/result', {
-          state: {
-            profile1: profiles[0],
-            profile2: profiles[1],
-            compatibilityScore: 99,
-          },
-        });
+    // 현재 프로필에 측정값 저장
+    if (measurementStatus === 'completed') {
+      const updatedProfiles = profiles.map((profile, index) =>
+        index === currentProfileIndex
+          ? { ...profile, heartRate, temperature }
+          : profile
+      );
+      setProfiles(updatedProfiles);
+
+      if (currentProfileIndex < profiles.length - 1) {
+        setCurrentProfileIndex(currentProfileIndex + 1);
+        setMeasurementStatus('idle');
+        setHeartRate(0);
+        setTemperature(0);
       } else {
-        navigate('/result', {
-          state: {
-            profile1: profiles[0],
-            profile2: profiles[1],
-            compatibilityScore: 99,
-          },
-        });
+        // 모든 사용자 측정 완료
+        // compatibility 페이지에서 온 경우(2명)는 result로, destiny-finder에서 온 경우는 compatibility로
+        if (updatedProfiles.length === 2) {
+          navigate('/result', {
+            state: {
+              profile1: updatedProfiles[0],
+              profile2: updatedProfiles[1],
+              compatibilityScore: 99,
+            },
+          });
+        } else {
+          navigate('/result', {
+            state: {
+              profile1: updatedProfiles[0],
+              profile2: updatedProfiles[1],
+              compatibilityScore: 99,
+            },
+          });
+        }
       }
     }
   };
@@ -103,6 +113,7 @@ const HeartRateMeasure: React.FC = () => {
           body={currentProfileIndex < profiles.length - 1 ? '다음으로' : '완료'}
           type="pink"
           onClick={handleNext}
+          disabled={measurementStatus !== 'completed'}
         />
       </_.MainHeader>
 
