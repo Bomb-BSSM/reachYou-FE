@@ -15,6 +15,8 @@ interface Profile {
 
 interface LocationState {
   profiles?: Profile[];
+  currentProfileId?: number;
+  returnPath?: string;
 }
 
 type MeasurementStatus = 'idle' | 'measuring' | 'completed';
@@ -25,12 +27,22 @@ const HeartRateMeasure: React.FC = () => {
   const locationState = location.state as LocationState;
 
   const [profiles, setProfiles] = useState<Profile[]>(locationState?.profiles || []);
-  const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
+  const currentProfileId = locationState?.currentProfileId;
+  const returnPath = locationState?.returnPath;
+
+  const [currentProfileIndex, setCurrentProfileIndex] = useState(() => {
+    if (currentProfileId) {
+      return profiles.findIndex(p => p.id === currentProfileId);
+    }
+    return 0;
+  });
+
   const [measurementStatus, setMeasurementStatus] = useState<MeasurementStatus>('idle');
   const [heartRate, setHeartRate] = useState(0);
   const [temperature, setTemperature] = useState(0);
 
   const currentProfile = profiles[currentProfileIndex];
+  const isSingleMeasurement = !!currentProfileId;
 
   // 심박수 측정 시뮬레이션
   useEffect(() => {
@@ -71,6 +83,17 @@ const HeartRateMeasure: React.FC = () => {
       );
       setProfiles(updatedProfiles);
 
+      // 단일 측정 모드인 경우 (destinyFinderList에서 온 경우)
+      if (isSingleMeasurement && returnPath) {
+        navigate(returnPath, {
+          state: {
+            profiles: updatedProfiles,
+          },
+        });
+        return;
+      }
+
+      // 연속 측정 모드인 경우
       if (currentProfileIndex < profiles.length - 1) {
         setCurrentProfileIndex(currentProfileIndex + 1);
         setMeasurementStatus('idle');
@@ -78,7 +101,7 @@ const HeartRateMeasure: React.FC = () => {
         setTemperature(0);
       } else {
         // 모든 사용자 측정 완료
-        // compatibility 페이지에서 온 경우(2명)는 result로, destiny-finder에서 온 경우는 compatibility로
+        // compatibility 페이지에서 온 경우(2명)는 result로
         if (updatedProfiles.length === 2) {
           navigate('/result', {
             state: {
@@ -110,7 +133,13 @@ const HeartRateMeasure: React.FC = () => {
           </_.HeaderText>
         </_.HeaderTextArea>
         <Button
-          body={currentProfileIndex < profiles.length - 1 ? '다음으로' : '완료'}
+          body={
+            isSingleMeasurement
+              ? '완료'
+              : currentProfileIndex < profiles.length - 1
+              ? '다음으로'
+              : '완료'
+          }
           type="pink"
           onClick={handleNext}
           disabled={measurementStatus !== 'completed'}

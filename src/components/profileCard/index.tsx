@@ -11,6 +11,8 @@ interface ProfileCardProps {
   onEdit?: (name: string, mbti: string) => void;
   onDelete?: () => void;
   onImageChange?: (imageUrl: string) => void;
+  onMeasure?: () => void;
+  isMeasured?: boolean;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
@@ -20,6 +22,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   onEdit,
   onDelete,
   onImageChange,
+  onMeasure,
+  isMeasured = false,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(name);
@@ -64,20 +68,24 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   };
 
   return (
-    <_.Card>
-      <_.ProfileImage onClick={handleImageClick}>
+    <_.Card $isMeasured={isMeasured}>
+      {isMeasured && <_.MeasuredBadge>✓ 측정 완료</_.MeasuredBadge>}
+
+      <_.ProfileImage onClick={onImageChange ? handleImageClick : undefined}>
         {imageUrl ? (
           <_.ProfileImg src={imageUrl} alt={name} />
         ) : (
           <_.ProfileImg src={normalProfile} />
         )}
       </_.ProfileImage>
-      <_.HiddenFileInput
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-      />
+      {onImageChange && (
+        <_.HiddenFileInput
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
+      )}
 
       <_.InfoSection>
         {isEditing ? (
@@ -108,7 +116,13 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       </_.InfoSection>
 
       <_.ButtonGroup>
-        {isEditing ? (
+        {onMeasure ? (
+          <Button
+            body={isMeasured ? '재측정' : '측정하기'}
+            type="pink"
+            onClick={onMeasure}
+          />
+        ) : isEditing ? (
           <>
             <Button body="저장" type="pink" onClick={handleSave} />
             <Button body="취소" type="white" onClick={handleCancel} />
