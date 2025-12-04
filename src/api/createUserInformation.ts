@@ -23,7 +23,7 @@ const createUserInformation = async ({
 }: createUserInforInterface) => {
   try {
     const response: createUserInforRes = await axios.post(
-      `http://localhost:8080//api/users`,
+      `http://127.0.0.1:8000/api/users`,
       {
         username: username,
         mbti: mbti,
