@@ -1,36 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import ProfileCard from '@/components/profileCard';
-import { useNavigate, useLocation } from 'react-router-dom';
-
-interface Profile {
-  id: number;
-  name: string;
-  mbti: string;
-  imageUrl?: string;
-  heartRate?: number;
-  temperature?: number;
-}
-
-interface LocationState {
-  profiles?: Profile[];
-}
+import { useNavigate } from 'react-router-dom';
+import { useProfiles } from '@/contexts/UserContext';
 
 const DestinyFinderList: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const locationState = location.state as LocationState;
+  const { profiles } = useProfiles();
 
-  const [profiles, setProfiles] = useState<Profile[]>(
-    locationState?.profiles || []
-  );
-
-  const handleMeasure = (id: number) => {
+  const handleMeasure = (userId: number) => {
     navigate('/heart-rate-measure', {
       state: {
-        profiles,
-        currentProfileId: id,
+        currentProfileId: userId,
         returnPath: '/destiny-finder/list'
       }
     });
@@ -47,10 +29,10 @@ const DestinyFinderList: React.FC = () => {
       return;
     }
 
-    navigate('/result', { state: { profiles } });
+    navigate('/result');
   };
 
-  const isMeasured = (profile: Profile) => {
+  const isMeasured = (profile: typeof profiles[0]) => {
     return !!(profile.heartRate && profile.temperature);
   };
 
@@ -80,11 +62,11 @@ const DestinyFinderList: React.FC = () => {
       <_.ProfileCardGrid>
         {profiles.map(profile => (
           <ProfileCard
-            key={profile.id}
-            name={profile.name}
+            key={profile.user_id}
+            name={profile.username}
             mbti={profile.mbti}
-            imageUrl={profile.imageUrl}
-            onMeasure={() => handleMeasure(profile.id)}
+            imageUrl={profile.profile_image_url}
+            onMeasure={() => handleMeasure(profile.user_id)}
             isMeasured={isMeasured(profile)}
           />
         ))}

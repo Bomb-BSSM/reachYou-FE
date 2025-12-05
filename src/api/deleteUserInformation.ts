@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
 interface deleteUserInforInterface {
-  user_id: string;
+  user_id: number;
 }
 const deleteUserInformation = async ({ user_id }: deleteUserInforInterface) => {
   try {
@@ -14,7 +14,7 @@ const deleteUserInformation = async ({ user_id }: deleteUserInforInterface) => {
 };
 
 export const useDeleteUserInformation = () => {
-  useMutation({
+  return useMutation({
     mutationFn: deleteUserInformation,
     onError: () => console.log('사용자 정보 삭제 실패'),
   });

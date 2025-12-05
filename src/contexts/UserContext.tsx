@@ -5,7 +5,8 @@ export interface Profile {
   username: string;
   mbti: string;
   profile_image_url?: string;
-  temprature?: number;
+  heartRate?: number;
+  temperature?: number;
 }
 
 interface ProfilesContextType {
@@ -14,6 +15,7 @@ interface ProfilesContextType {
   updateProfile: (userId: number, data: Partial<Profile>) => void;
   removeProfile: (userId: number) => void;
   clearProfiles: () => void;
+  setAllProfiles: (profiles: Profile[]) => void;
 }
 
 const ProfilesContext = createContext<ProfilesContextType | undefined>(
@@ -53,6 +55,11 @@ export const ProfilesProvider: React.FC<{ children: React.ReactNode }> = ({
     sessionStorage.removeItem('profiles');
   };
 
+  const setAllProfiles = (newProfiles: Profile[]) => {
+    setProfiles(newProfiles);
+    sessionStorage.setItem('profiles', JSON.stringify(newProfiles));
+  };
+
   return (
     <ProfilesContext.Provider
       value={{
@@ -61,6 +68,7 @@ export const ProfilesProvider: React.FC<{ children: React.ReactNode }> = ({
         updateProfile,
         removeProfile,
         clearProfiles,
+        setAllProfiles,
       }}
     >
       {children}
