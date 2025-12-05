@@ -13,13 +13,12 @@ const DestinyFinderList: React.FC = () => {
     navigate('/heart-rate-measure', {
       state: {
         currentProfileId: userId,
-        returnPath: '/destiny-finder/list'
-      }
+        returnPath: '/destiny-finder/list',
+      },
     });
   };
 
   const handleNext = () => {
-    // 모든 프로필이 측정 완료되었는지 확인
     const allMeasured = profiles.every(
       profile => profile.heartRate && profile.temperature
     );
@@ -32,7 +31,7 @@ const DestinyFinderList: React.FC = () => {
     navigate('/result');
   };
 
-  const isMeasured = (profile: typeof profiles[0]) => {
+  const isMeasured = (profile: (typeof profiles)[0]) => {
     return !!(profile.heartRate && profile.temperature);
   };
 
