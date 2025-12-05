@@ -22,12 +22,12 @@ const createUserInformation = async ({
   profile_image_url,
 }: createUserInforInterface) => {
   try {
-    const response: createUserInforRes = await axios.post(`/api/users`, {
+    const response = await axios.post<createUserInforRes>(`/api/users`, {
       username: username,
       mbti: mbti,
       profile_image_url: profile_image_url,
     });
-    return response.user;
+    return response.data.user;
   } catch (error) {
     console.error('유저 정보 추가 에러: ', error);
   }

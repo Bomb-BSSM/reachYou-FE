@@ -41,13 +41,15 @@ const DestinyFinder = () => {
           profile_image_url: imageSrc,
         },
         {
-          onSuccess: data => {
-            if (data) {
+          onSuccess: user => {
+            console.log('ㅇㅇ');
+            if (user) {
               const newProfile: Profile = {
-                id: data.user_id,
-                name: data.username,
-                mbti: data.mbti,
+                id: user.user_id,
+                name: user.username,
+                mbti: user.mbti,
               };
+              console.log(newProfile);
               setProfiles([...profiles, newProfile]);
             }
           },
