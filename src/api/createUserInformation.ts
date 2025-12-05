@@ -22,14 +22,11 @@ const createUserInformation = async ({
   profile_image_url,
 }: createUserInforInterface) => {
   try {
-    const response: createUserInforRes = await axios.post(
-      `http://127.0.0.1:8000/api/users`,
-      {
-        username: username,
-        mbti: mbti,
-        profile_image_url: profile_image_url,
-      }
-    );
+    const response: createUserInforRes = await axios.post(`/api/users`, {
+      username: username,
+      mbti: mbti,
+      profile_image_url: profile_image_url,
+    });
     return response.user;
   } catch (error) {
     console.error('유저 정보 추가 에러: ', error);

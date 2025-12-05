@@ -7,6 +7,7 @@ import ProfileCard from '@/components/profileCard';
 import AddProfileIcon from '@/assets/profileAddImg.svg';
 import { useNavigate } from 'react-router-dom';
 import { MBTI_OPTIONS } from '@/utils/mbti';
+import { useCreateUserInformation } from '@/api/createUserInformation';
 
 interface Profile {
   id: number;
@@ -22,6 +23,7 @@ const DestinyFinder = () => {
   const [name, setName] = useState('');
   const [mbti, setMbti] = useState('');
   const imgInputRef = useRef<HTMLInputElement>(null);
+  const createUserMutation = useCreateUserInformation();
 
   const handleAddProfile = () => {
     if (profiles.length >= 8) {
@@ -32,13 +34,26 @@ const DestinyFinder = () => {
       return;
     }
     if (name && mbti) {
-      const newProfile: Profile = {
-        id: Date.now(),
-        name,
-        mbti,
-        imageUrl: imageSrc || null,
-      };
-      setProfiles([...profiles, newProfile]);
+      createUserMutation.mutate(
+        {
+          username: name,
+          mbti: mbti,
+          profile_image_url: imageSrc,
+        },
+        {
+          onSuccess: data => {
+            if (data) {
+              const newProfile: Profile = {
+                id: data.user_id,
+                name: data.username,
+                mbti: data.mbti,
+              };
+              setProfiles([...profiles, newProfile]);
+            }
+          },
+        }
+      );
+
       setName('');
       setMbti('');
       setImageSrc('');
