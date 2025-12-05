@@ -7,21 +7,22 @@ import ProfileCard from '@/components/profileCard';
 import AddProfileIcon from '@/assets/profileAddImg.svg';
 import { useNavigate } from 'react-router-dom';
 import { MBTI_OPTIONS } from '@/utils/mbti';
-
-interface Profile {
-  id: number;
-  name: string;
-  mbti: string;
-  imageUrl?: string | null;
-}
+import { useCreateUserInformation } from '@/api/createUserInformation';
+import { useUpdateUserInformation } from '@/api/updateUserInformation';
+import { useDeleteUserInformation } from '@/api/deleteUserInformation';
+import { useProfiles } from '@/contexts/UserContext';
 
 const DestinyFinder = () => {
+  const { profiles, addProfile, updateProfile, removeProfile } = useProfiles();
+
   const navigate = useNavigate();
   const [imageSrc, setImageSrc] = useState<string>('');
-  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [name, setName] = useState('');
   const [mbti, setMbti] = useState('');
   const imgInputRef = useRef<HTMLInputElement>(null);
+  const createUserMutation = useCreateUserInformation();
+  const updateUserMutation = useUpdateUserInformation();
+  const deleteUserMutation = useDeleteUserInformation();
 
   const handleAddProfile = () => {
     if (profiles.length >= 8) {
@@ -32,37 +33,56 @@ const DestinyFinder = () => {
       return;
     }
     if (name && mbti) {
-      const newProfile: Profile = {
-        id: Date.now(),
-        name,
-        mbti,
-        imageUrl: imageSrc || null,
-      };
-      setProfiles([...profiles, newProfile]);
-      setName('');
-      setMbti('');
-      setImageSrc('');
+      createUserMutation.mutate(
+        {
+          username: name,
+          mbti: mbti,
+          profile_image_url: imageSrc,
+        },
+        {
+          onSuccess: user => {
+            if (user) {
+              addProfile({
+                user_id: user.user_id,
+                username: user.username,
+                mbti: user.mbti,
+                profile_image_url: user.profile_image_url,
+              });
+            }
+            setName('');
+            setMbti('');
+            setImageSrc('');
+          },
+        }
+      );
     }
   };
 
-  const handleEditProfile = (id: number, name: string, mbti: string) => {
-    setProfiles(
-      profiles.map(profile =>
-        profile.id === id ? { ...profile, name, mbti } : profile
-      )
-    );
+  const handleEditProfile = (
+    userId: number,
+    name: string,
+    mbti: string,
+    profileImg?: string
+  ) => {
+    updateUserMutation.mutate({
+      user_id: userId,
+      username: name,
+      mbti: mbti,
+      profile_image_url: profileImg,
+    });
+    updateProfile(userId, {
+      username: name,
+      mbti,
+      profile_image_url: profileImg,
+    });
   };
 
-  const handleImageChange = (imageUrl: string, id?: number) => {
-    if (!id) {
+  const handleImageChange = (imageUrl: string, userId?: number) => {
+    if (!userId) {
       setImageSrc(imageUrl);
       return;
     }
-    setProfiles(
-      profiles.map(profile =>
-        profile.id === id ? { ...profile, imageUrl } : profile
-      )
-    );
+    updateProfile(userId, { profile_image_url: imageUrl });
   };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,8 +97,14 @@ const DestinyFinder = () => {
     }
   };
 
-  const handleDeleteProfile = (id: number) => {
-    setProfiles(profiles.filter(profile => profile.id !== id));
+  const handleDeleteProfile = (userId: number) => {
+    deleteUserMutation.mutate(
+      { user_id: userId },
+      {
+        onSuccess: () => removeProfile(userId),
+        onError: () => alert('프로필 삭제가 삭제 되었습니다.'),
+      }
+    );
   };
 
   const handleNext = () => {
@@ -86,7 +112,7 @@ const DestinyFinder = () => {
       alert('프로필 갯수는 최소 3개 이상입니다.');
       return;
     }
-    navigate('/destiny-finder/list', { state: { profiles } });
+    navigate('/destiny-finder/list');
   };
 
   return (
@@ -146,17 +172,22 @@ const DestinyFinder = () => {
           <_.ProfileCardGrid>
             {profiles.map(profile => (
               <ProfileCard
-                key={profile.id}
-                name={profile.name}
+                key={profile.user_id}
+                name={profile.username}
                 mbti={profile.mbti}
-                imageUrl={profile.imageUrl || undefined}
+                imageUrl={profile.profile_image_url || undefined}
                 onEdit={(name, mbti) =>
-                  handleEditProfile(profile.id, name, mbti)
+                  handleEditProfile(
+                    profile.user_id,
+                    name,
+                    mbti,
+                    profile.profile_image_url
+                  )
                 }
                 onImageChange={imageUrl =>
-                  handleImageChange(imageUrl, profile.id)
+                  handleImageChange(imageUrl, profile.user_id)
                 }
-                onDelete={() => handleDeleteProfile(profile.id)}
+                onDelete={() => handleDeleteProfile(profile.user_id)}
               />
             ))}
           </_.ProfileCardGrid>

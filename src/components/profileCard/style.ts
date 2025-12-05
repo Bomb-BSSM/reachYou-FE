@@ -1,15 +1,32 @@
 import styled from 'styled-components';
 
-export const Card = styled.div`
+export const Card = styled.div<{ $isMeasured?: boolean }>`
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 20px;
   padding: 28px;
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.black};
+  background: #fff;
+  border: 1px solid
+    ${({ theme, $isMeasured }) =>
+      $isMeasured ? theme.colors.primary : theme.colors.black};
   border-radius: 6px;
   align-items: flex-start;
   justify-content: center;
+  transition: all 0.2s ease;
+`;
+
+export const MeasuredBadge = styled.div`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 8px;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
 `;
 
 export const ProfileImage = styled.div`

@@ -1,52 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import ProfileCard from '@/components/profileCard';
-import { useNavigate, useLocation } from 'react-router-dom';
-
-interface Profile {
-  id: number;
-  name: string;
-  mbti: string;
-  imageUrl?: string;
-}
-
-interface LocationState {
-  profiles?: Profile[];
-}
+import { useNavigate } from 'react-router-dom';
+import { useProfiles } from '@/contexts/UserContext';
 
 const DestinyFinderList: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const locationState = location.state as LocationState;
+  const { profiles } = useProfiles();
 
-  const [profiles, setProfiles] = useState<Profile[]>(
-    locationState?.profiles || []
-  );
-
-  const handleEditProfile = (id: number, name: string, mbti: string) => {
-    setProfiles(
-      profiles.map(profile =>
-        profile.id === id ? { ...profile, name, mbti } : profile
-      )
-    );
-  };
-
-  const handleImageChange = (id: number, imageUrl: string) => {
-    setProfiles(
-      profiles.map(profile =>
-        profile.id === id ? { ...profile, imageUrl } : profile
-      )
-    );
-  };
-
-  const handleDeleteProfile = (id: number) => {
-    setProfiles(profiles.filter(profile => profile.id !== id));
+  const handleMeasure = (userId: number) => {
+    navigate('/heart-rate-measure', {
+      state: {
+        currentProfileId: userId,
+        returnPath: '/destiny-finder/list'
+      }
+    });
   };
 
   const handleNext = () => {
-    navigate('/heart-rate-measure', { state: { profiles } });
+    // 모든 프로필이 측정 완료되었는지 확인
+    const allMeasured = profiles.every(
+      profile => profile.heartRate && profile.temperature
+    );
+
+    if (!allMeasured) {
+      alert('모든 사용자의 측정을 완료해주세요.');
+      return;
+    }
+
+    navigate('/result');
   };
+
+  const isMeasured = (profile: typeof profiles[0]) => {
+    return !!(profile.heartRate && profile.temperature);
+  };
+
+  const allMeasured = profiles.every(isMeasured);
+  const measuredCount = profiles.filter(isMeasured).length;
 
   return (
     <_.Container>
@@ -54,22 +45,29 @@ const DestinyFinderList: React.FC = () => {
         <_.HeaderTextArea>
           <_.HeaderText color="pink">Q2.</_.HeaderText>
           <_.HeaderText color="black">
-            운명찾기를 진행할 사람의 정보를 확인해 주세요.
+            운명찾기를 진행할 사람의 생체 정보를 측정해 주세요.
           </_.HeaderText>
         </_.HeaderTextArea>
-        <Button body="다음으로" type="pink" onClick={handleNext} />
+        <_.MeasureStatus>
+          {measuredCount} / {profiles.length} 측정 완료
+        </_.MeasureStatus>
+        <Button
+          body="결과 보기"
+          type="pink"
+          onClick={handleNext}
+          disabled={!allMeasured}
+        />
       </_.MainHeader>
 
       <_.ProfileCardGrid>
         {profiles.map(profile => (
           <ProfileCard
-            key={profile.id}
-            name={profile.name}
+            key={profile.user_id}
+            name={profile.username}
             mbti={profile.mbti}
-            imageUrl={profile.imageUrl}
-            onEdit={(name, mbti) => handleEditProfile(profile.id, name, mbti)}
-            onImageChange={imageUrl => handleImageChange(profile.id, imageUrl)}
-            onDelete={() => handleDeleteProfile(profile.id)}
+            imageUrl={profile.profile_image_url}
+            onMeasure={() => handleMeasure(profile.user_id)}
+            isMeasured={isMeasured(profile)}
           />
         ))}
       </_.ProfileCardGrid>

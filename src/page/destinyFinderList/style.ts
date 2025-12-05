@@ -20,12 +20,21 @@ export const MainHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
 `;
 
 export const HeaderTextArea = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+`;
+
+export const MeasureStatus = styled.div`
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.primary};
+  white-space: nowrap;
 `;
 
 export const HeaderText = styled.h3<{ color: string }>`

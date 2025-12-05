@@ -3,18 +3,11 @@ import * as _ from './style';
 import Button from '@/components/button';
 import HeartRateWaveform from '@/components/heartRateWaveform';
 import { useNavigate, useLocation } from 'react-router-dom';
-
-interface Profile {
-  id: number;
-  name: string;
-  mbti: string;
-  imageUrl?: string;
-  heartRate?: number;
-  temperature?: number;
-}
+import { useProfiles } from '@/contexts/UserContext';
 
 interface LocationState {
-  profiles?: Profile[];
+  currentProfileId?: number;
+  returnPath?: string;
 }
 
 type MeasurementStatus = 'idle' | 'measuring' | 'completed';
@@ -23,14 +16,24 @@ const HeartRateMeasure: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as LocationState;
+  const { profiles, updateProfile } = useProfiles();
 
-  const [profiles] = useState<Profile[]>(locationState?.profiles || []);
-  const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
+  const currentProfileId = locationState?.currentProfileId;
+  const returnPath = locationState?.returnPath;
+
+  const [currentProfileIndex, setCurrentProfileIndex] = useState(() => {
+    if (currentProfileId) {
+      return profiles.findIndex(p => p.user_id === currentProfileId);
+    }
+    return 0;
+  });
+
   const [measurementStatus, setMeasurementStatus] = useState<MeasurementStatus>('idle');
   const [heartRate, setHeartRate] = useState(0);
   const [temperature, setTemperature] = useState(0);
 
   const currentProfile = profiles[currentProfileIndex];
+  const isSingleMeasurement = !!currentProfileId;
 
   // 심박수 측정 시뮬레이션
   useEffect(() => {
@@ -62,30 +65,26 @@ const HeartRateMeasure: React.FC = () => {
   };
 
   const handleNext = () => {
-    if (currentProfileIndex < profiles.length - 1) {
-      setCurrentProfileIndex(currentProfileIndex + 1);
-      setMeasurementStatus('idle');
-      setHeartRate(0);
-      setTemperature(0);
-    } else {
-      // 모든 사용자 측정 완료
-      // compatibility 페이지에서 온 경우(2명)는 result로, destiny-finder에서 온 경우는 compatibility로
-      if (profiles.length === 2) {
-        navigate('/result', {
-          state: {
-            profile1: profiles[0],
-            profile2: profiles[1],
-            compatibilityScore: 99,
-          },
-        });
+    // 현재 프로필에 측정값 저장
+    if (measurementStatus === 'completed') {
+      // 전역 상태 업데이트
+      updateProfile(currentProfile.user_id, { heartRate, temperature });
+
+      // 단일 측정 모드인 경우 (destinyFinderList에서 온 경우)
+      if (isSingleMeasurement && returnPath) {
+        navigate(returnPath);
+        return;
+      }
+
+      // 연속 측정 모드인 경우
+      if (currentProfileIndex < profiles.length - 1) {
+        setCurrentProfileIndex(currentProfileIndex + 1);
+        setMeasurementStatus('idle');
+        setHeartRate(0);
+        setTemperature(0);
       } else {
-        navigate('/result', {
-          state: {
-            profile1: profiles[0],
-            profile2: profiles[1],
-            compatibilityScore: 99,
-          },
-        });
+        // 모든 사용자 측정 완료 - result 페이지로
+        navigate('/result');
       }
     }
   };
@@ -96,13 +95,20 @@ const HeartRateMeasure: React.FC = () => {
         <_.HeaderTextArea>
           <_.HeaderText color="pink">Q{currentProfileIndex + 1}.</_.HeaderText>
           <_.HeaderText color="black">
-            {currentProfile?.name}님의 심박수와 체온을 측정해 주세요.
+            {currentProfile?.username}님의 심박수와 체온을 측정해 주세요.
           </_.HeaderText>
         </_.HeaderTextArea>
         <Button
-          body={currentProfileIndex < profiles.length - 1 ? '다음으로' : '완료'}
+          body={
+            isSingleMeasurement
+              ? '완료'
+              : currentProfileIndex < profiles.length - 1
+              ? '다음으로'
+              : '완료'
+          }
           type="pink"
           onClick={handleNext}
+          disabled={measurementStatus !== 'completed'}
         />
       </_.MainHeader>
 

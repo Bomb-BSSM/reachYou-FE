@@ -12,16 +12,15 @@ export const Container = styled.div`
   overflow: hidden;
 `;
 
-export const HeartBackground = styled.div`
+export const HeartBackground = styled.div<{ src: string }>`
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 680px;
-  height: 500px;
-  opacity: 0.2;
-  filter: blur(15px);
-  background-image: url("data:image/svg+xml,%3Csvg width='806' height='597' viewBox='0 0 806 597' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M403 596.523C403 596.523 0.5 447.023 0.5 298.523C0.5 150.023 134 0.523438 268.5 149.023C403 298.523 403 298.523 403 298.523C403 298.523 403 298.523 537.5 149.023C672 0.523438 805.5 150.023 805.5 298.523C805.5 447.023 403 596.523 403 596.523Z' fill='%23F97A9F'/%3E%3C/svg%3E");
+  width: 806px;
+  height: 597px;
+  opacity: 0.7;
+  background-image: url(${props => props.src});
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
