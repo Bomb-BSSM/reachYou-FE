@@ -15,7 +15,7 @@ const Home: React.FC = () => {
         <_.Button onClick={() => navigation('/destiny-finder')}>
           운명 찾기
         </_.Button>
-        <_.Button>커플 랭킹</_.Button>
+        <_.Button onClick={() => navigation('/ranking')}>커플 랭킹</_.Button>
       </_.ButtonArea>
     </_.Container>
   );

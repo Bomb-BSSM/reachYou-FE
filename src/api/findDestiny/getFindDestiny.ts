@@ -39,8 +39,9 @@ const getFinderDestiny = async ({ user_id }: getDestinyProps) => {
 };
 export const useGetFinderDestiny = ({ user_id }: getDestinyProps) => {
   return useQuery({
-    queryKey: ['finderDestiiny', user_id],
-    queryFn: () => getFinderDestiny,
+    queryKey: ['finderDestiny', user_id],
+    queryFn: () => getFinderDestiny({ user_id }),
+    enabled: !!user_id,
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   });
