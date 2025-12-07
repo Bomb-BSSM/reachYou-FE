@@ -6,11 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import { useProfiles } from '@/contexts/UserContext';
 import { useCalculateDestinyAll } from '@/api/findDestiny/calculateDestinyAll';
 import { useAlert } from '@/contexts/AlertContext';
+import { useMeasureSensor } from '@/api/sensor/measureSensor';
 
 const DestinyFinderList: React.FC = () => {
   const navigate = useNavigate();
   const { profiles } = useProfiles();
   const calculateDestinyMutation = useCalculateDestinyAll();
+  const measureSensorMutation = useMeasureSensor();
   const { showAlert } = useAlert();
 
   const isMeasured = (profile: (typeof profiles)[0]) => {
@@ -36,12 +38,20 @@ const DestinyFinderList: React.FC = () => {
         state: { userId },
       });
     } else {
-      navigate('/heart-rate-measure', {
-        state: {
-          currentProfileId: userId,
-          returnPath: '/destiny-finder/list',
-        },
-      });
+      measureSensorMutation.mutate(
+        { user_id: userId },
+        {
+          onSuccess: () => {
+            navigate('/heart-rate-measure', {
+              state: {
+                currentProfileId: userId,
+                returnPath: '/destiny-finder/list',
+              },
+            });
+          },
+          onError: () => showAlert('센서 측정이 실패했습니다.'),
+        }
+      );
     }
   };
 
