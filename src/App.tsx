@@ -11,12 +11,14 @@ import Propose from './page/propose';
 import ProposeSuccess from './page/proposeSuccess';
 import ProposeFail from './page/proposeFail';
 import Ranking from './page/ranking';
+import RankingDetail from './page/rankingDetail';
 import { ProfilesProvider } from '@/contexts/UserContext';
+import { AlertProvider } from '@/contexts/AlertContext';
 
 const App: React.FC = () => {
   return (
     <ProfilesProvider>
-      <ProfilesProvider>
+      <AlertProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -33,9 +35,10 @@ const App: React.FC = () => {
             <Route path="/propose-success" element={<ProposeSuccess />} />
             <Route path="/propose-fail" element={<ProposeFail />} />
             <Route path="/ranking" element={<Ranking />} />
+            <Route path="/ranking-detail" element={<RankingDetail />} />
           </Routes>
         </BrowserRouter>
-      </ProfilesProvider>
+      </AlertProvider>
     </ProfilesProvider>
   );
 };

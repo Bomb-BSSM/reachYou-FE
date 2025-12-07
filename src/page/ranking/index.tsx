@@ -2,8 +2,8 @@ import React from 'react';
 import * as _ from './style';
 import { useNavigate } from 'react-router-dom';
 import normalProfile from '@/assets/normalProfileImg.svg';
-import heartIcon from '@/assets/heart.svg';
 import Button from '@/components/button';
+import RankingPreview from '@/components/rankingPreview';
 
 interface CoupleRanking {
   rank: number;
@@ -78,55 +78,45 @@ const Ranking: React.FC<RankingProps> = ({ rankings }) => {
     navigate('/');
   };
 
+  const handleCardClick = (item: CoupleRanking) => {
+    navigate('/ranking-detail', {
+      state: {
+        coupleName: item.coupleName,
+        person1: {
+          name: item.couple.person1.name,
+          mbti: 'ISFP',
+          image: item.couple.person1.image,
+        },
+        person2: {
+          name: item.couple.person2.name,
+          mbti: 'INFJ',
+          image: item.couple.person2.image,
+        },
+        score: item.score,
+        rating: item.rating,
+        heartRateScore: 99,
+        temperatureScore: 88,
+        mbtiCompatibility: '매우 좋은',
+      },
+    });
+  };
+
   return (
     <_.Container>
-      <_.ContentWrapper>
-        <_.Header>
-          <_.Title>커플랭킹</_.Title>
-          <Button body="돌아가기" type="pink" onClick={handleBack} />
-        </_.Header>
+      <_.Header>
+        <_.Title>커플랭킹</_.Title>
+        <Button body="돌아가기" type="pink" onClick={handleBack} />
+      </_.Header>
 
-        <_.RankingList>
-          {displayRankings.map((item) => (
-            <_.RankingCard key={item.rank}>
-              <_.LeftSection>
-                <_.Rank>{item.rank}</_.Rank>
-
-                <_.CoupleInfo>
-                  <_.PersonCard>
-                    <_.ProfileImage src={item.couple.person1.image} alt={item.couple.person1.name} />
-                    <_.PersonName>{item.couple.person1.name}</_.PersonName>
-                  </_.PersonCard>
-
-                  <_.HeartIcon src={heartIcon} alt="heart" />
-
-                  <_.PersonCard>
-                    <_.ProfileImage src={item.couple.person2.image} alt={item.couple.person2.name} />
-                    <_.PersonName>{item.couple.person2.name}</_.PersonName>
-                  </_.PersonCard>
-                </_.CoupleInfo>
-
-                <_.CoupleName>{item.coupleName}</_.CoupleName>
-              </_.LeftSection>
-
-              <_.RightSection>
-                <_.ScoreBox>
-                  <_.ScoreLabel>점수</_.ScoreLabel>
-                  <_.Score>{item.score}</_.Score>
-                </_.ScoreBox>
-
-                <_.StarRating>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <_.Star key={star} filled={star <= item.rating}>
-                      ★
-                    </_.Star>
-                  ))}
-                </_.StarRating>
-              </_.RightSection>
-            </_.RankingCard>
-          ))}
-        </_.RankingList>
-      </_.ContentWrapper>
+      <_.RankingList>
+        {displayRankings.map((item) => (
+          <RankingPreview
+            key={item.rank}
+            item={item}
+            onClick={() => handleCardClick(item)}
+          />
+        ))}
+      </_.RankingList>
     </_.Container>
   );
 };
