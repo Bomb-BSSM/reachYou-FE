@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import Input from '@/components/input';
@@ -14,7 +14,7 @@ import { useProfiles } from '@/contexts/UserContext';
 import { useAlert } from '@/contexts/AlertContext';
 
 const DestinyFinder = () => {
-  const { profiles, addProfile, updateProfile, removeProfile } = useProfiles();
+  const { profiles, addProfile, updateProfile, removeProfile, clearProfiles } = useProfiles();
 
   const navigate = useNavigate();
   const [imageSrc, setImageSrc] = useState<string>('');
@@ -25,6 +25,10 @@ const DestinyFinder = () => {
   const updateUserMutation = useUpdateUserInformation();
   const deleteUserMutation = useDeleteUserInformation();
   const { showAlert } = useAlert();
+
+  useEffect(() => {
+    clearProfiles();
+  }, []);
 
   const handleAddProfile = () => {
     if (profiles.length >= 8) {
@@ -104,7 +108,7 @@ const DestinyFinder = () => {
       { user_id: userId },
       {
         onSuccess: () => removeProfile(userId),
-        onError: () => showAlert('프로필 삭제가 삭제 되었습니다.'),
+        onError: () => showAlert('프로필이 삭제 되지 않았습니다.'),
       }
     );
   };
