@@ -118,7 +118,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       <_.ButtonGroup>
         {onMeasure ? (
           <Button
-            body={isMeasured ? '재측정' : '측정하기'}
+            body={isMeasured ? '확인하기' : '측정하기'}
             type="pink"
             onClick={onMeasure}
           />

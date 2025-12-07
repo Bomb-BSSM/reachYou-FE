@@ -7,9 +7,9 @@ import ProfileCard from '@/components/profileCard';
 import AddProfileIcon from '@/assets/profileAddImg.svg';
 import { useNavigate } from 'react-router-dom';
 import { MBTI_OPTIONS } from '@/utils/mbti';
-import { useCreateUserInformation } from '@/api/createUserInformation';
-import { useUpdateUserInformation } from '@/api/updateUserInformation';
-import { useDeleteUserInformation } from '@/api/deleteUserInformation';
+import { useCreateUserInformation } from '@/api/user/createUserInformation';
+import { useUpdateUserInformation } from '@/api/user/updateUserInformation';
+import { useDeleteUserInformation } from '@/api/user/deleteUserInformation';
 import { useProfiles } from '@/contexts/UserContext';
 
 const DestinyFinder = () => {

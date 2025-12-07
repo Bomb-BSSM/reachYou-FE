@@ -1,43 +1,56 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import ProfileCard from '@/components/profileCard';
 import { useNavigate } from 'react-router-dom';
 import { useProfiles } from '@/contexts/UserContext';
+import { useCalculateDestinyAll } from '@/api/findDestiny/calculateDestinyAll';
 
 const DestinyFinderList: React.FC = () => {
   const navigate = useNavigate();
   const { profiles } = useProfiles();
+  const calculateDestinyMutation = useCalculateDestinyAll();
 
-  const handleMeasure = (userId: number) => {
-    navigate('/heart-rate-measure', {
-      state: {
-        currentProfileId: userId,
-        returnPath: '/destiny-finder/list'
-      }
-    });
-  };
-
-  const handleNext = () => {
-    // 모든 프로필이 측정 완료되었는지 확인
-    const allMeasured = profiles.every(
-      profile => profile.heartRate && profile.temperature
-    );
-
-    if (!allMeasured) {
-      alert('모든 사용자의 측정을 완료해주세요.');
-      return;
-    }
-
-    navigate('/result');
-  };
-
-  const isMeasured = (profile: typeof profiles[0]) => {
+  const isMeasured = (profile: (typeof profiles)[0]) => {
     return !!(profile.heartRate && profile.temperature);
   };
 
   const allMeasured = profiles.every(isMeasured);
   const measuredCount = profiles.filter(isMeasured).length;
+
+  useEffect(() => {
+    if (allMeasured && profiles.length > 0) {
+      calculateDestinyMutation.mutate();
+    }
+  }, [allMeasured, profiles.length]);
+
+  const handleCardClick = (userId: number) => {
+    const profile = profiles.find(p => p.user_id === userId);
+
+    if (!profile) return;
+
+    if (isMeasured(profile)) {
+      navigate('/destiny-result', {
+        state: { userId },
+      });
+    } else {
+      navigate('/heart-rate-measure', {
+        state: {
+          currentProfileId: userId,
+          returnPath: '/destiny-finder/list',
+        },
+      });
+    }
+  };
+
+  const handleNext = () => {
+    if (!allMeasured) {
+      alert('모든 사용자의 측정을 완료해주세요.');
+      return;
+    }
+
+    navigate('/destiny-finder/list');
+  };
 
   return (
     <_.Container>
@@ -66,7 +79,7 @@ const DestinyFinderList: React.FC = () => {
             name={profile.username}
             mbti={profile.mbti}
             imageUrl={profile.profile_image_url}
-            onMeasure={() => handleMeasure(profile.user_id)}
+            onMeasure={() => handleCardClick(profile.user_id)}
             isMeasured={isMeasured(profile)}
           />
         ))}
