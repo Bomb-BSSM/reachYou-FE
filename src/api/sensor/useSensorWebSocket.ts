@@ -11,80 +11,28 @@ type SensorStatus =
   | 'complete'
   | 'error';
 
-interface BaseSensorMessage {
-  status: SensorStatus;
-  message: string;
-}
-
-interface ReadyMessage extends BaseSensorMessage {
-  status: 'ready';
+export interface SensorResult {
   user_id: number;
   username: string;
-}
-
-interface InitializingMessage extends BaseSensorMessage {
-  status: 'initializing';
-  progress: number;
-}
-
-interface MeasuringTemperatureMessage extends BaseSensorMessage {
-  status: 'measuring_temperature';
-  progress: number;
-  current_value: number;
-}
-
-interface TemperatureCompleteMessage extends BaseSensorMessage {
-  status: 'temperature_complete';
-  progress: number;
+  heart_rate: number;
   temperature: number;
 }
 
-interface MeasuringHeartrateMessage extends BaseSensorMessage {
-  status: 'measuring_heartrate';
-  progress: number;
-  current_value: number;
-  elapsed: number;
+export interface SensorMessage {
+  status: SensorStatus;
+  message: string;
+  user_id?: number;
+  username?: string;
+  progress?: number;
+  current_value?: number;
+  elapsed?: number;
+  temperature?: number;
+  result?: SensorResult;
 }
-
-interface CalculatingMessage extends BaseSensorMessage {
-  status: 'calculating';
-  progress: number;
-}
-
-interface SavingMessage extends BaseSensorMessage {
-  status: 'saving';
-  progress: number;
-}
-
-interface CompleteMessage extends BaseSensorMessage {
-  status: 'complete';
-  progress: number;
-  result: {
-    user_id: number;
-    username: string;
-    heart_rate: number;
-    temperature: number;
-  };
-}
-
-interface ErrorMessage extends BaseSensorMessage {
-  status: 'error';
-}
-
-export type SensorMessage =
-  | ReadyMessage
-  | InitializingMessage
-  | MeasuringTemperatureMessage
-  | TemperatureCompleteMessage
-  | MeasuringHeartrateMessage
-  | CalculatingMessage
-  | SavingMessage
-  | CompleteMessage
-  | ErrorMessage;
 
 interface UseSensorWebSocketOptions {
   onMessage?: (message: SensorMessage) => void;
-  onComplete?: (result: CompleteMessage['result']) => void;
+  onComplete?: (result: SensorResult) => void;
   onError?: (error: string) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
@@ -133,7 +81,7 @@ export const useSensorWebSocket = (
           });
           optionsRef.current?.onMessage?.(message);
 
-          if (message.status === 'complete') {
+          if (message.status === 'complete' && message.result) {
             optionsRef.current?.onComplete?.(message.result);
           } else if (message.status === 'error') {
             queueMicrotask(() => {
@@ -215,7 +163,7 @@ export const useSensorWebSocket = (
           });
           optionsRef.current?.onMessage?.(message);
 
-          if (message.status === 'complete') {
+          if (message.status === 'complete' && message.result) {
             optionsRef.current?.onComplete?.(message.result);
           } else if (message.status === 'error') {
             queueMicrotask(() => {
