@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import ProfileCard from '@/components/profileCard';
@@ -7,7 +7,7 @@ import { useProfiles } from '@/contexts/UserContext';
 import { useCalculateDestinyAll } from '@/api/findDestiny/calculateDestinyAll';
 import { useAlert } from '@/contexts/AlertContext';
 
-const DestinyFinderList: React.FC = () => {
+const DestinyFinderList = () => {
   const navigate = useNavigate();
   const { profiles } = useProfiles();
   const calculateDestinyMutation = useCalculateDestinyAll();
@@ -20,12 +20,6 @@ const DestinyFinderList: React.FC = () => {
 
   const allMeasured = profiles.every(isMeasured);
   const measuredCount = profiles.filter(isMeasured).length;
-
-  useEffect(() => {
-    if (allMeasured && profiles.length > 0) {
-      calculateDestinyMutation.mutate();
-    }
-  }, [allMeasured, profiles.length]);
 
   const handleCardClick = (userId: number) => {
     const profile = profiles.find(p => p.user_id === userId);
@@ -62,6 +56,9 @@ const DestinyFinderList: React.FC = () => {
     }
 
     setShowResults(true);
+    calculateDestinyMutation.mutate(profiles.length, {
+      onError: () => showAlert('운명의 상대 계산에 실패했습니다.'),
+    });
   };
 
   return (
@@ -92,7 +89,9 @@ const DestinyFinderList: React.FC = () => {
             mbti={profile.mbti}
             imageUrl={profile.profile_image_url}
             onMeasure={() => handleCardClick(profile.user_id)}
-            onRemeasure={showResults ? undefined : () => handleRemeasure(profile.user_id)}
+            onRemeasure={
+              showResults ? undefined : () => handleRemeasure(profile.user_id)
+            }
             isMeasured={isMeasured(profile)}
           />
         ))}

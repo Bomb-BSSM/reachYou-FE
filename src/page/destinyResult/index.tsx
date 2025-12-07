@@ -95,9 +95,7 @@ const DestinyResult: React.FC = () => {
                     {match.compatibility_score}점
                   </_.CompatibilityScore>
                   <_.DetailScores>
-                    <_.DetailScore>
-                      MBTI: {match.mbti_score}점
-                    </_.DetailScore>
+                    <_.DetailScore>MBTI: {match.mbti_score}점</_.DetailScore>
                     <_.DetailScore>
                       심박수: {match.heart_rate_score}점
                     </_.DetailScore>
