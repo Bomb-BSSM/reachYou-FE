@@ -65,20 +65,24 @@ export const HeaderTitle = styled.p`
   white-space: pre-wrap;
 `;
 
-export const CurrentUserSection = styled.div`
+export const ProfileSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 102px;
+`;
+
+export const ProfileBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 32px;
-  background: #fffefa;
-  border: 2px solid ${({ theme }) => theme.colors.primary};
-  border-radius: 16px;
+  gap: 32px;
+  width: 160px;
 `;
 
 export const ProfileImageWrapper = styled.div`
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   border-radius: 100px;
   overflow: hidden;
   background: ${({ theme }) => theme.colors.g400};
@@ -93,44 +97,31 @@ export const ProfileImage = styled.img`
 
 export const ProfileInfo = styled.div`
   display: flex;
-  gap: 16px;
+  gap: 20px;
   align-items: center;
   font-family: 'Paperlogy', sans-serif;
-`;
-
-export const ProfileName = styled.p`
   font-size: 24px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.black};
+`;
+
+export const ProfileName = styled.p`
   margin: 0;
 `;
 
 export const ProfileMBTI = styled.p`
-  font-size: 20px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.g600};
   margin: 0;
 `;
 
-export const UserStats = styled.div`
-  display: flex;
-  gap: 24px;
+export const CompatibilityScore = styled.p`
   font-family: 'Paperlogy', sans-serif;
-`;
-
-export const StatItem = styled.p`
-  font-size: 16px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.black};
+  font-size: 32px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.primary};
   margin: 0;
 `;
 
-export const Highlight = styled.span`
-  color: ${({ theme }) => theme.colors.primary};
-  font-weight: 600;
-`;
-
-export const MatchesSection = styled.div`
+export const AnalysisSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -145,94 +136,45 @@ export const SectionTitle = styled.p`
   margin: 0;
 `;
 
-export const MatchesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-`;
-
-export const MatchCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 24px;
-  background: ${({ theme }) => theme.colors.white};
+export const AnalysisBox = styled.div`
+  background: #fffefa;
   border: 1px solid ${({ theme }) => theme.colors.black};
   border-radius: 12px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    filter: brightness(0.9);
-  }
-`;
-
-export const MatchImageWrapper = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: ${({ theme }) => theme.colors.g400};
-`;
-
-export const MatchImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
-export const MatchInfo = styled.div`
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  gap: 12px;
+`;
+
+export const AnalysisText = styled.p`
   font-family: 'Paperlogy', sans-serif;
-`;
-
-export const MatchName = styled.p`
-  font-size: 18px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.black};
-  margin: 0;
-`;
-
-export const MatchMBTI = styled.p`
   font-size: 14px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.g600};
+  color: ${({ theme }) => theme.colors.black};
+  line-height: normal;
+  letter-spacing: 0.56px;
   margin: 0;
 `;
 
-export const ScoreSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-`;
-
-export const CompatibilityScore = styled.p`
-  font-family: 'Paperlogy', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
+export const Highlight = styled.span`
   color: ${({ theme }) => theme.colors.primary};
-  margin: 0;
 `;
 
-export const DetailScores = styled.div`
+export const OtherCompatibilitySection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 24px;
   width: 100%;
-  font-family: 'Paperlogy', sans-serif;
 `;
 
-export const DetailScore = styled.p`
-  font-size: 12px;
+export const OtherCompatibilityText = styled.p`
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 14px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.g600};
+  color: ${({ theme }) => theme.colors.black};
+  line-height: 22px;
+  letter-spacing: 0.56px;
   margin: 0;
-  text-align: center;
 `;
 
 export const LoadingText = styled.p`

@@ -13,7 +13,7 @@ interface calculateProps {
 
 const calculateDestinyAll = async ({ user_length }: calculateProps) => {
   try {
-    const response = await axios.get<calculateResponse>(
+    const response = await axios.post<calculateResponse>(
       `/api/fated-match/calculate-all/${user_length}`
     );
     return response.data;
