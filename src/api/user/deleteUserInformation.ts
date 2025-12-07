@@ -6,7 +6,7 @@ interface deleteUserInforInterface {
 }
 const deleteUserInformation = async ({ user_id }: deleteUserInforInterface) => {
   try {
-    await axios.delete(`http://127.0.0.1:8000/api/users/${user_id}`);
+    await axios.delete(`/api/users/${user_id}`);
   } catch (error) {
     console.error('사용자 정보 삭제 오류: ', error);
     throw error;

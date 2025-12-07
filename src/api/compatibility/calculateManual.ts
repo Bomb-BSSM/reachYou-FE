@@ -10,6 +10,13 @@ interface calculateManualProps {
   temperature_2: number;
 }
 
+interface CalculateManualResponse {
+  total_score: number;
+  mbti_score: number;
+  heart_rate_score: number;
+  temperature_score: number;
+}
+
 const calculateManual = async ({
   mbti_1,
   mbti_2,
@@ -19,14 +26,17 @@ const calculateManual = async ({
   temperature_2,
 }: calculateManualProps) => {
   try {
-    const response = await axios.post(`/api/compatibility/calculate-manual`, {
-      mbti_1,
-      mbti_2,
-      heart_rate_1,
-      heart_rate_2,
-      temperature_1,
-      temperature_2,
-    });
+    const response = await axios.post<CalculateManualResponse>(
+      `/api/compatibility/calculate-manual`,
+      {
+        mbti_1,
+        mbti_2,
+        heart_rate_1,
+        heart_rate_2,
+        temperature_1,
+        temperature_2,
+      }
+    );
     return response;
   } catch (error) {
     console.error('수동 계산 오류: ', error);

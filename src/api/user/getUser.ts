@@ -13,7 +13,7 @@ interface getUserResponse {
 
 const getUser = async ({ user_id }: getUserInterface) => {
   try {
-    const response = axios.get<getUserResponse>(`/api/users/${user_id}`);
+    const response = await axios.get<getUserResponse>(`/api/users/${user_id}`);
     return response;
   } catch (error) {
     console.error('사용자 조회 실패: ', error);
@@ -24,7 +24,7 @@ const getUser = async ({ user_id }: getUserInterface) => {
 export const useGetUser = ({ user_id }: getUserInterface) => {
   return useQuery({
     queryKey: ['user', user_id],
-    queryFn: () => getUser,
+    queryFn: () => getUser({ user_id }),
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   });

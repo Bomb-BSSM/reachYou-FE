@@ -44,7 +44,7 @@ const calculateCompatibility = async ({
   }
 };
 
-export const useCaculateCompatibility = () => {
+export const useCalculateCompatibility = () => {
   return useMutation({
     mutationFn: calculateCompatibility,
     onError: () => console.log('두 사용자 궁합 계산 실패.'),

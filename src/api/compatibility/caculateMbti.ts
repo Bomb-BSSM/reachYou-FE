@@ -15,7 +15,7 @@ interface calculateMbtiResponse {
 const calculateMbti = async ({ mbti_1, mbti_2 }: calculateMbtiProps) => {
   try {
     const response = await axios.post<calculateMbtiResponse>(
-      `api/compatibility/mbti/${mbti_1}/${mbti_2}`
+      `/api/compatibility/mbti/${mbti_1}/${mbti_2}`
     );
     return response;
   } catch (error) {
