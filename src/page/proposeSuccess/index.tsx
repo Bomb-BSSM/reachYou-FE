@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import * as _ from './style';
 import { useNavigate, useLocation } from 'react-router-dom';
 import normalProfile from '@/assets/normalProfileImg.svg';
+import { useAlert } from '@/contexts/AlertContext';
 
 interface ProposeSuccessProps {
   proposerName?: string;
@@ -19,6 +20,7 @@ const ProposeSuccess: React.FC<ProposeSuccessProps> = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as ProposeSuccessProps | null;
+  const { showAlert } = useAlert();
 
   const proposerName = props.proposerName || locationState?.proposerName || '이원희';
   const proposerMbti = props.proposerMbti || locationState?.proposerMbti || 'ISFP';
@@ -34,14 +36,14 @@ const ProposeSuccess: React.FC<ProposeSuccessProps> = (props) => {
 
   const handleSubmit = () => {
     if (!coupleName.trim()) {
-      alert('커플명을 작성해주세요.');
+      showAlert('커플명을 작성해주세요.');
       return;
     }
 
     if (props.onSubmit || locationState?.onSubmit) {
       (props.onSubmit || locationState?.onSubmit)?.(coupleName, description);
     } else {
-      alert(`커플명: ${coupleName}\n소개: ${description || '없음'}\n등록되었습니다!`);
+      showAlert('등록되었습니다!', `커플명: ${coupleName}\n소개: ${description || '없음'}`);
       navigate('/');
     }
   };

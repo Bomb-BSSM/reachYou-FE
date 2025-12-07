@@ -5,11 +5,13 @@ import ProfileCard from '@/components/profileCard';
 import { useNavigate } from 'react-router-dom';
 import { useProfiles } from '@/contexts/UserContext';
 import { useCalculateDestinyAll } from '@/api/findDestiny/calculateDestinyAll';
+import { useAlert } from '@/contexts/AlertContext';
 
 const DestinyFinderList: React.FC = () => {
   const navigate = useNavigate();
   const { profiles } = useProfiles();
   const calculateDestinyMutation = useCalculateDestinyAll();
+  const { showAlert } = useAlert();
 
   const isMeasured = (profile: (typeof profiles)[0]) => {
     return !!(profile.heartRate && profile.temperature);
@@ -45,7 +47,7 @@ const DestinyFinderList: React.FC = () => {
 
   const handleNext = () => {
     if (!allMeasured) {
-      alert('모든 사용자의 측정을 완료해주세요.');
+      showAlert('모든 사용자의 측정을 완료해주세요.');
       return;
     }
 
