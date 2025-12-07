@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
-import HeartRateWaveform from '@/components/heartRateWaveform';
+import MeasurementCard from '@/components/measurementCard';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useProfiles } from '@/contexts/UserContext';
+import { useSensorWebSocket } from '@/api/sensor/useSensorWebSocket';
+import { useMeasureSensor } from '@/api/sensor/measureSensor';
+import { useAlert } from '@/contexts/AlertContext';
 
 interface LocationState {
   currentProfileId?: number;
@@ -12,11 +15,13 @@ interface LocationState {
 
 type MeasurementStatus = 'idle' | 'measuring' | 'completed';
 
-const HeartRateMeasure: React.FC = () => {
+const HeartRateMeasure = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as LocationState;
   const { profiles, updateProfile } = useProfiles();
+  const measureSensorMutation = useMeasureSensor();
+  const { showAlert } = useAlert();
 
   const currentProfileId = locationState?.currentProfileId;
   const returnPath = locationState?.returnPath;
@@ -28,27 +33,62 @@ const HeartRateMeasure: React.FC = () => {
     return 0;
   });
 
-  const [measurementStatus, setMeasurementStatus] = useState<MeasurementStatus>('idle');
+  const [measurementStatus, setMeasurementStatus] =
+    useState<MeasurementStatus>('idle');
   const [heartRate, setHeartRate] = useState(0);
   const [temperature, setTemperature] = useState(0);
+  const [shouldUseMockData, setShouldUseMockData] = useState(false);
+  const [allMeasurementsCompleted, setAllMeasurementsCompleted] =
+    useState(false);
+  const mockDataTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentProfile = profiles[currentProfileIndex];
   const isSingleMeasurement = !!currentProfileId;
 
-  // 심박수 측정 시뮬레이션
+  // 웹소켓 연결
+  const { latestMessage, error, disconnect } = useSensorWebSocket(
+    measurementStatus === 'measuring' ? currentProfile?.user_id : null,
+    {
+      onMessage: message => {
+        // 웹소켓에서 데이터가 오면 목 데이터 타이머 취소
+        if (mockDataTimeoutRef.current) {
+          clearTimeout(mockDataTimeoutRef.current);
+          mockDataTimeoutRef.current = null;
+        }
+        setShouldUseMockData(false);
+
+        // 실시간 측정 값 업데이트
+        if (message.current_value !== undefined) {
+          setHeartRate(Math.round(message.current_value));
+        }
+        if (message.temperature !== undefined) {
+          setTemperature(message.temperature);
+        }
+      },
+      onComplete: result => {
+        setHeartRate(result.heart_rate);
+        setTemperature(result.temperature);
+        setMeasurementStatus('completed');
+        setShouldUseMockData(false);
+      },
+      onError: errorMsg => {
+        console.error('웹소켓 에러:', errorMsg);
+        setShouldUseMockData(true);
+      },
+    }
+  );
+
   useEffect(() => {
-    if (measurementStatus === 'measuring') {
+    if (shouldUseMockData && measurementStatus === 'measuring') {
       const interval = setInterval(() => {
-        // 60-100 사이의 랜덤한 심박수
-        setHeartRate(Math.floor(Math.random() * 40) + 60);
-        // 36.0-37.5 사이의 랜덤한 체온
-        setTemperature(Math.floor(Math.random() * 15) / 10 + 36);
+        setHeartRate(Math.floor(Math.random() * 10) + 95);
+        setTemperature(36.5 + Math.random() * 0.2 - 0.1);
       }, 100);
 
-      // 3초 후 측정 완료
       const timeout = setTimeout(() => {
+        setHeartRate(99);
+        setTemperature(36.5);
         setMeasurementStatus('completed');
-        clearInterval(interval);
       }, 3000);
 
       return () => {
@@ -56,94 +96,158 @@ const HeartRateMeasure: React.FC = () => {
         clearTimeout(timeout);
       };
     }
-  }, [measurementStatus]);
+  }, [shouldUseMockData, measurementStatus]);
+
+  // 웹소켓 연결 실패 감지 (5초 후에도 데이터가 없으면 목 데이터 사용)
+  useEffect(() => {
+    if (measurementStatus === 'measuring' && !shouldUseMockData) {
+      mockDataTimeoutRef.current = setTimeout(() => {
+        if (!latestMessage && !error) {
+          console.warn('웹소켓 데이터를 받지 못함. 목 데이터 사용.');
+          setShouldUseMockData(true);
+        }
+      }, 5000);
+
+      return () => {
+        if (mockDataTimeoutRef.current) {
+          clearTimeout(mockDataTimeoutRef.current);
+          mockDataTimeoutRef.current = null;
+        }
+      };
+    }
+  }, [measurementStatus, shouldUseMockData, latestMessage, error]);
+
+  // 컴포넌트 언마운트 시 웹소켓 연결 해제
+  useEffect(() => {
+    return () => {
+      disconnect();
+      if (mockDataTimeoutRef.current) {
+        clearTimeout(mockDataTimeoutRef.current);
+      }
+    };
+  }, [disconnect]);
 
   const handleStartMeasurement = () => {
+    // 재측정인 경우 기존 연결 종료
+    disconnect();
+
+    // 측정 상태 즉시 변경 (웹소켓 연결 시작)
     setMeasurementStatus('measuring');
     setHeartRate(0);
     setTemperature(0);
+    setShouldUseMockData(false);
+
+    // API 호출 (웹소켓과 동시 진행)
+    measureSensorMutation.mutate(
+      { user_id: currentProfile.user_id },
+      {
+        onError: () => {
+          showAlert('센서 측정이 실패했습니다.');
+          // API 실패해도 웹소켓으로 측정 시도 또는 목 데이터 사용
+        },
+      }
+    );
   };
 
   const handleNext = () => {
-    // 현재 프로필에 측정값 저장
     if (measurementStatus === 'completed') {
-      // 전역 상태 업데이트
       updateProfile(currentProfile.user_id, { heartRate, temperature });
 
-      // 단일 측정 모드인 경우 (destinyFinderList에서 온 경우)
       if (isSingleMeasurement && returnPath) {
+        disconnect();
         navigate(returnPath);
         return;
       }
 
-      // 연속 측정 모드인 경우
       if (currentProfileIndex < profiles.length - 1) {
         setCurrentProfileIndex(currentProfileIndex + 1);
         setMeasurementStatus('idle');
         setHeartRate(0);
         setTemperature(0);
+        setShouldUseMockData(false);
+        disconnect();
       } else {
-        // 모든 사용자 측정 완료 - result 페이지로
-        navigate('/result');
+        disconnect();
+        setAllMeasurementsCompleted(true);
       }
     }
   };
 
+  const handleViewResult = (userId: number) => {
+    navigate('/result', { state: { userId } });
+  };
+
   return (
     <_.Container>
-      <_.MainHeader>
-        <_.HeaderTextArea>
-          <_.HeaderText color="pink">Q{currentProfileIndex + 1}.</_.HeaderText>
-          <_.HeaderText color="black">
-            {currentProfile?.username}님의 심박수와 체온을 측정해 주세요.
-          </_.HeaderText>
-        </_.HeaderTextArea>
-        <Button
-          body={
-            isSingleMeasurement
-              ? '완료'
-              : currentProfileIndex < profiles.length - 1
-              ? '다음으로'
-              : '완료'
-          }
-          type="pink"
-          onClick={handleNext}
-          disabled={measurementStatus !== 'completed'}
-        />
-      </_.MainHeader>
+      {allMeasurementsCompleted ? (
+        <>
+          <_.MainHeader>
+            <_.HeaderTextArea>
+              <_.HeaderText color="black">
+                각자의 결과를 확인해보세요!
+              </_.HeaderText>
+            </_.HeaderTextArea>
+          </_.MainHeader>
 
-      <_.ContentWrapper>
-        <_.MeasurementCard>
-          <_.CardHeader>
-            <_.CardTitle>생체 정보 측정</_.CardTitle>
-            <_.TemperatureInfo $isActive={measurementStatus === 'measuring'}>
-              <_.TemperatureLabel>체온</_.TemperatureLabel>
-              <_.TemperatureValue>
-                {measurementStatus === 'idle' && '--'}
-                {measurementStatus === 'measuring' && `${temperature.toFixed(1)}°C`}
-                {measurementStatus === 'completed' && `${temperature.toFixed(1)}°C`}
-              </_.TemperatureValue>
-            </_.TemperatureInfo>
-          </_.CardHeader>
+          <_.ResultCardsGrid>
+            {profiles.map(profile => (
+              <MeasurementCard
+                key={profile.user_id}
+                username={profile.username}
+                temperature={profile.temperature || 36.5}
+                heartRate={profile.heartRate || 99}
+                measurementStatus="completed"
+                showButton={true}
+                buttonText="확인하기"
+                onButtonClick={() => handleViewResult(profile.user_id)}
+              />
+            ))}
+          </_.ResultCardsGrid>
+        </>
+      ) : (
+        <>
+          <_.MainHeader>
+            <_.HeaderTextArea>
+              <_.HeaderText color="pink">
+                Q{currentProfileIndex + 1}.
+              </_.HeaderText>
+              <_.HeaderText color="black">
+                {currentProfile?.username}님의 심박수와 체온을 측정해 주세요.
+              </_.HeaderText>
+            </_.HeaderTextArea>
+            <Button
+              body={
+                isSingleMeasurement
+                  ? '완료'
+                  : currentProfileIndex < profiles.length - 1
+                    ? '다음으로'
+                    : '완료'
+              }
+              type="pink"
+              onClick={handleNext}
+              disabled={measurementStatus !== 'completed'}
+            />
+          </_.MainHeader>
 
-          <HeartRateWaveform isActive={measurementStatus !== 'idle'} />
+          <_.ContentWrapper>
+            <MeasurementCard
+              temperature={temperature}
+              heartRate={heartRate}
+              measurementStatus={measurementStatus}
+            />
 
-          <_.MeasurementInfo>
-            <_.HeartRateLabel>심박수</_.HeartRateLabel>
-            <_.HeartRateValue>
-              {measurementStatus === 'idle' && '측정 시작을 눌러주세요'}
-              {measurementStatus === 'measuring' && `${heartRate} BPM`}
-              {measurementStatus === 'completed' && `${heartRate} BPM`}
-            </_.HeartRateValue>
-          </_.MeasurementInfo>
-        </_.MeasurementCard>
-
-        {measurementStatus === 'idle' && (
-          <_.StartButton>
-            <Button body="측정 시작" type="pink" onClick={handleStartMeasurement} />
-          </_.StartButton>
-        )}
-      </_.ContentWrapper>
+            {measurementStatus === 'idle' && (
+              <_.StartButton>
+                <Button
+                  body="측정 시작"
+                  type="pink"
+                  onClick={handleStartMeasurement}
+                />
+              </_.StartButton>
+            )}
+          </_.ContentWrapper>
+        </>
+      )}
     </_.Container>
   );
 };

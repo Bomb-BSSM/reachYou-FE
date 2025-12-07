@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import ProfileCard from '@/components/profileCard';
@@ -6,14 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import { useProfiles } from '@/contexts/UserContext';
 import { useCalculateDestinyAll } from '@/api/findDestiny/calculateDestinyAll';
 import { useAlert } from '@/contexts/AlertContext';
-import { useMeasureSensor } from '@/api/sensor/measureSensor';
 
 const DestinyFinderList: React.FC = () => {
   const navigate = useNavigate();
   const { profiles } = useProfiles();
   const calculateDestinyMutation = useCalculateDestinyAll();
-  const measureSensorMutation = useMeasureSensor();
   const { showAlert } = useAlert();
+  const [showResults, setShowResults] = useState(false);
 
   const isMeasured = (profile: (typeof profiles)[0]) => {
     return !!(profile.heartRate && profile.temperature);
@@ -38,21 +37,22 @@ const DestinyFinderList: React.FC = () => {
         state: { userId },
       });
     } else {
-      measureSensorMutation.mutate(
-        { user_id: userId },
-        {
-          onSuccess: () => {
-            navigate('/heart-rate-measure', {
-              state: {
-                currentProfileId: userId,
-                returnPath: '/destiny-finder/list',
-              },
-            });
-          },
-          onError: () => showAlert('센서 측정이 실패했습니다.'),
-        }
-      );
+      navigate('/heart-rate-measure', {
+        state: {
+          currentProfileId: userId,
+          returnPath: '/destiny-finder/list',
+        },
+      });
     }
+  };
+
+  const handleRemeasure = (userId: number) => {
+    navigate('/heart-rate-measure', {
+      state: {
+        currentProfileId: userId,
+        returnPath: '/destiny-finder/list',
+      },
+    });
   };
 
   const handleNext = () => {
@@ -61,7 +61,7 @@ const DestinyFinderList: React.FC = () => {
       return;
     }
 
-    navigate('/destiny-finder/list');
+    setShowResults(true);
   };
 
   return (
@@ -92,6 +92,7 @@ const DestinyFinderList: React.FC = () => {
             mbti={profile.mbti}
             imageUrl={profile.profile_image_url}
             onMeasure={() => handleCardClick(profile.user_id)}
+            onRemeasure={showResults ? undefined : () => handleRemeasure(profile.user_id)}
             isMeasured={isMeasured(profile)}
           />
         ))}

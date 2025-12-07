@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 
 export const Container = styled.div`
   position: relative;
@@ -51,87 +51,6 @@ export const ContentWrapper = styled.div`
   width: 650px;
 `;
 
-export const MeasurementCard = styled.div`
-  width: 100%;
-  max-width: 650px;
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.black};
-  border-radius: 8px;
-  padding: 28px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-`;
-
-export const CardHeader = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-export const CardTitle = styled.h4`
-  font-family: 'Paperlogy', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.black};
-`;
-
-const pulse = keyframes`
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-`;
-
-export const TemperatureInfo = styled.div<{ $isActive: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  animation: ${props => props.$isActive ? pulse : 'none'} 1.5s ease-in-out infinite;
-`;
-
-export const TemperatureLabel = styled.span`
-  font-family: 'Paperlogy', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.g500};
-`;
-
-export const TemperatureValue = styled.span`
-  font-family: 'S-Core Dream', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-export const MeasurementInfo = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-`;
-
-export const HeartRateLabel = styled.span`
-  font-family: 'Paperlogy', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.g500};
-`;
-
-export const HeartRateValue = styled.p`
-  font-family: 'S-Core Dream', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.primary};
-  text-align: center;
-  margin: 0;
-`;
-
 export const StartButton = styled.div`
   width: 280px;
   margin-top: 8px;
@@ -142,4 +61,19 @@ export const StartButton = styled.div`
     font-size: 16px;
     border-width: 2px;
   }
+`;
+
+export const ResultCardsGrid = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 650px));
+  gap: 32px;
+  width: 90%;
+  max-width: 1400px;
+  padding: 0 16px;
+  margin-top: 32px;
+  justify-content: center;
 `;

@@ -12,6 +12,7 @@ interface ProfileCardProps {
   onDelete?: () => void;
   onImageChange?: (imageUrl: string) => void;
   onMeasure?: () => void;
+  onRemeasure?: () => void;
   isMeasured?: boolean;
 }
 
@@ -23,6 +24,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   onDelete,
   onImageChange,
   onMeasure,
+  onRemeasure,
   isMeasured = false,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -117,11 +119,13 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
       <_.ButtonGroup>
         {onMeasure ? (
-          <Button
-            body={isMeasured ? '확인하기' : '측정하기'}
-            type="pink"
-            onClick={onMeasure}
-          />
+          isMeasured && onRemeasure ? (
+            <Button body="재측정" type="pink" onClick={onRemeasure} />
+          ) : isMeasured ? (
+            <Button body="확인하기" type="pink" onClick={onMeasure} />
+          ) : (
+            <Button body="측정하기" type="pink" onClick={onMeasure} />
+          )
         ) : isEditing ? (
           <>
             <Button body="저장" type="pink" onClick={handleSave} />
