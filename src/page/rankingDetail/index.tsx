@@ -109,6 +109,7 @@ const RankingDetail: React.FC = () => {
     addStarScopeMutation.mutate(
       {
         couple_id: coupleId,
+        user_id: 1,
         rating: userRating,
         comment: commentText,
       },
