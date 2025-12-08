@@ -1,32 +1,64 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import NormalPofileImg from '@/assets/normalProfileImg.svg';
 import HeartBackground from '@/assets/heartBackground.svg';
 import { useNavigate } from 'react-router-dom';
 import { useProfiles } from '@/contexts/UserContext';
+import { useCalculateCompatibility } from '@/api/compatibility/calculateCompatibility';
+import LoadingSpinner from '@/components/loadingSpinner';
+import { useAlert } from '@/contexts/AlertContext';
 
 const Result: React.FC = () => {
   const navigate = useNavigate();
   const { profiles, clearProfiles } = useProfiles();
+  const { showAlert } = useAlert();
+  const calculateCompatibilityMutation = useCalculateCompatibility();
 
-  const profile1 = profiles[0] || {
-    user_id: 0,
-    username: '사용자1',
-    mbti: 'MBTI',
-    heartRate: 75,
-    temperature: 36.5,
-    profile_image_url: '',
-  };
-  const profile2 = profiles[1] || {
-    user_id: 0,
-    username: '사용자2',
-    mbti: 'MBTI',
-    heartRate: 78,
-    temperature: 36.8,
-    profile_image_url: '',
-  };
-  const compatibilityScore = 99; // TODO: 실제 궁합 점수 계산 로직
+  const [compatibilityData, setCompatibilityData] = useState<{
+    total_score: number;
+    mbti_score: number;
+    heart_rate_score: number;
+    temperature_score: number;
+  } | null>(null);
+
+  const profile1 = profiles[0];
+  const profile2 = profiles[1];
+
+  useEffect(() => {
+    if (!profile1 || !profile2) {
+      showAlert(
+        '프로필 정보를 찾을 수 없습니다.',
+        '처음부터 다시 시작해주세요.',
+        () => {
+          navigate('/');
+        }
+      );
+      return;
+    }
+
+    calculateCompatibilityMutation.mutate(
+      {
+        user_id_1: profile1.user_id,
+        user_id_2: profile2.user_id,
+      },
+      {
+        onSuccess: response => {
+          setCompatibilityData(response.data.compatibility);
+        },
+        onError: () => {
+          showAlert(
+            '궁합 계산에 실패했습니다.',
+            '잠시 후 다시 시도해주세요.',
+            () => {
+              navigate('/');
+            }
+          );
+        },
+      }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleBack = () => {
     clearProfiles(); // 전역 상태 초기화
@@ -34,6 +66,8 @@ const Result: React.FC = () => {
   };
 
   const handleConfess = () => {
+    if (!compatibilityData || !profile1 || !profile2) return;
+
     navigate('/propose', {
       state: {
         origin: 'compatibility',
@@ -45,13 +79,30 @@ const Result: React.FC = () => {
         receiverName: profile2.username,
         receiverMbti: profile2.mbti,
         receiverImage: profile2.profile_image_url || NormalPofileImg,
-        compatibilityScore: compatibilityScore,
-        heartRateCompatibility: 99,
-        temperatureCompatibility: 88,
-        mbtiCompatibility: 95,
+        compatibilityScore: compatibilityData.total_score,
+        heartRateCompatibility: compatibilityData.heart_rate_score,
+        temperatureCompatibility: compatibilityData.temperature_score,
+        mbtiCompatibility: compatibilityData.mbti_score,
       },
     });
   };
+
+  if (
+    calculateCompatibilityMutation.isPending ||
+    !compatibilityData ||
+    !profile1 ||
+    !profile2
+  ) {
+    return (
+      <_.Container>
+        <_.HeartBackground src={HeartBackground} />
+        <_.LoadingContainer>
+          <LoadingSpinner size={60} />
+          <_.LoadingText>궁합 계산 중...</_.LoadingText>
+        </_.LoadingContainer>
+      </_.Container>
+    );
+  }
 
   return (
     <_.Container>
@@ -60,9 +111,9 @@ const Result: React.FC = () => {
       <_.ContentWrapper>
         <_.MainHeader>
           <_.HeaderTextArea>
-            <_.HeaderPink>Q1.</_.HeaderPink>
+            <_.HeaderPink>결과</_.HeaderPink>
             <_.HeaderTitle>
-              {profile1.username} 님의 운명의 상대는 {profile2.username} 님입니다!
+              {profile1.username} 님과 {profile2.username} 님의 궁합 결과입니다!
             </_.HeaderTitle>
           </_.HeaderTextArea>
           <Button body="돌아가기" type="pink" onClick={handleBack} />
@@ -82,7 +133,9 @@ const Result: React.FC = () => {
             </_.ProfileInfo>
           </_.ProfileBox>
 
-          <_.CompatibilityScore>{compatibilityScore}</_.CompatibilityScore>
+          <_.CompatibilityScore>
+            {compatibilityData.total_score}
+          </_.CompatibilityScore>
 
           <_.ProfileBox>
             <_.ProfileImageWrapper>
@@ -102,39 +155,24 @@ const Result: React.FC = () => {
           <_.SectionTitle>유사도 분석</_.SectionTitle>
           <_.AnalysisBox>
             <_.AnalysisText>
-              {profile1.username} 님은 {profile2.username} 님과{' '}
-              <_.Highlight>심박도</_.Highlight>가 99%로 가장 유사했습니다!
+              {profile1.username} 님과 {profile2.username} 님의{' '}
+              <_.Highlight>MBTI</_.Highlight>는 {compatibilityData.mbti_score}%
+              만큼 유사했습니다!
             </_.AnalysisText>
             <_.AnalysisText>
-              {profile1.username} 님은 {profile2.username} 님과{' '}
-              <_.Highlight>온도</_.Highlight>가 88%로 유사했습니다!
+              {profile1.username} 님과 {profile2.username} 님의{' '}
+              <_.Highlight>심박수</_.Highlight>는{' '}
+              {compatibilityData.heart_rate_score}% 만큼 유사했습니다!
             </_.AnalysisText>
             <_.AnalysisText>
-              {profile1.username} 님과 {profile2.username} 님은{' '}
-              <_.Highlight>MBTI</_.Highlight>의 궁합이 매우 좋은 편입니다!
+              {profile1.username} 님과 {profile2.username} 님의{' '}
+              <_.Highlight>체온</_.Highlight>은{' '}
+              {compatibilityData.temperature_score}% 만큼 유사했습니다!
             </_.AnalysisText>
           </_.AnalysisBox>
         </_.AnalysisSection>
 
-        <_.OtherCompatibilitySection>
-          <_.SectionTitle>다른 사람과의 궁합</_.SectionTitle>
-          <_.OtherCompatibilityText>
-            {profile1.username} 님은 <_.Highlight>이원희</_.Highlight>님과 10점으로
-            가장 사이가 나쁜 관계입니다. 체온이 비슷했으며 심박도에서 큰 차이가
-            나타났습니다.
-            <br />
-            {profile1.username} 님은 <_.Highlight>이로하</_.Highlight>님과 88 점으로
-            좋은 관계입니다! 이로하 님과 체온이 가장 비슷했으며 MBTI에서 차이가
-            나타났습니다.
-            <br />
-            {profile1.username} 님은 <_.Highlight>빌려온 고양이</_.Highlight> 님과
-            90 점으로 잘 어울리는 관계입니다! 심박도가 비슷했습니다.
-          </_.OtherCompatibilityText>
-        </_.OtherCompatibilitySection>
-
-        <_.ConfessButton>
-          <Button body="고백하기" type="pink" onClick={handleConfess} />
-        </_.ConfessButton>
+        <Button body="고백하기" type="pink" onClick={handleConfess} />
       </_.ContentWrapper>
     </_.Container>
   );

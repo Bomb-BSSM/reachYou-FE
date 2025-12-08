@@ -188,3 +188,23 @@ export const ConfessButton = styled.div`
     border-width: 2px;
   }
 `;
+
+export const LoadingContainer = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+`;
+
+export const LoadingText = styled.p`
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text};
+  margin: 0;
+`;
