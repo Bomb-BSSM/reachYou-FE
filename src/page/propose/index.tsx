@@ -2,6 +2,7 @@ import React from 'react';
 import * as _ from './style';
 import { useNavigate, useLocation } from 'react-router-dom';
 import normalProfile from '@/assets/normalProfileImg.svg';
+import HeartBackground from '@/assets/heartBackground.svg';
 
 interface ProposeProps {
   proposerName?: string;
@@ -13,27 +14,38 @@ interface ProposeProps {
   compatibilityScore?: number;
   heartRateCompatibility?: number;
   temperatureCompatibility?: number;
+  mbtiCompatibility?: number;
   onAccept?: () => void;
   onReject?: () => void;
 }
 
-const Propose: React.FC<ProposeProps> = (props) => {
+const Propose: React.FC<ProposeProps> = props => {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as ProposeProps | null;
 
-  const proposerName = props.proposerName || locationState?.proposerName || '이원희';
-  const proposerMbti = props.proposerMbti || locationState?.proposerMbti || 'ISFP';
-  const proposerImage = props.proposerImage || locationState?.proposerImage || normalProfile;
-  const receiverName = props.receiverName || locationState?.receiverName || '이원희';
-  const receiverMbti = props.receiverMbti || locationState?.receiverMbti || 'ISFP';
-  const receiverImage = props.receiverImage || locationState?.receiverImage || normalProfile;
+  const proposerName =
+    props.proposerName || locationState?.proposerName || '이원희';
+  const proposerMbti =
+    props.proposerMbti || locationState?.proposerMbti || 'ISFP';
+  const proposerImage =
+    props.proposerImage || locationState?.proposerImage || normalProfile;
+  const receiverName =
+    props.receiverName || locationState?.receiverName || '이원희';
+  const receiverMbti =
+    props.receiverMbti || locationState?.receiverMbti || 'ISFP';
+  const receiverImage =
+    props.receiverImage || locationState?.receiverImage || normalProfile;
   const compatibilityScore =
     props.compatibilityScore || locationState?.compatibilityScore || 99;
   const heartRateCompatibility =
     props.heartRateCompatibility || locationState?.heartRateCompatibility || 99;
   const temperatureCompatibility =
-    props.temperatureCompatibility || locationState?.temperatureCompatibility || 88;
+    props.temperatureCompatibility ||
+    locationState?.temperatureCompatibility ||
+    88;
+  const mbtiCompatibility =
+    props.mbtiCompatibility || locationState?.mbtiCompatibility || 95;
 
   const handleAccept = () => {
     if (props.onAccept || locationState?.onAccept) {
@@ -72,7 +84,7 @@ const Propose: React.FC<ProposeProps> = (props) => {
   };
   return (
     <_.Container>
-      <_.BackgroundHeart />
+      <_.BackgroundHeart src={HeartBackground} />
 
       <_.ContentWrapper>
         <_.Title>
@@ -106,17 +118,18 @@ const Propose: React.FC<ProposeProps> = (props) => {
         <_.InfoBox>
           <_.InfoText>
             {proposerName} 님은 {receiverName} 님과{' '}
-            <_.HighlightText>심박도</_.HighlightText>는 {heartRateCompatibility}%로
-            가장 유사했습니다!
+            <_.HighlightText>심박도</_.HighlightText>는 {heartRateCompatibility}
+            %로 가장 유사했습니다!
           </_.InfoText>
           <_.InfoText>
             {proposerName} 님은 {receiverName} 님과{' '}
-            <_.HighlightText>온도</_.HighlightText>는 {temperatureCompatibility}%로
-            유사했습니다!
+            <_.HighlightText>온도</_.HighlightText>는 {temperatureCompatibility}
+            %로 유사했습니다!
           </_.InfoText>
           <_.InfoText>
             {proposerName} 님과 {receiverName} 님은{' '}
-            <_.HighlightText>MBTI</_.HighlightText>는 궁합이 매우 좋은 편입니다!
+            <_.HighlightText>MBTI</_.HighlightText>는 {mbtiCompatibility}%로
+            유사했습니다!
           </_.InfoText>
         </_.InfoBox>
 

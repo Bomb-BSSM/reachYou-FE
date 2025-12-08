@@ -2,6 +2,7 @@ import React from 'react';
 import * as _ from './style';
 import { useNavigate, useLocation } from 'react-router-dom';
 import normalProfile from '@/assets/normalProfileImg.svg';
+import HeartBackground from '@/assets/heartBackground.svg';
 
 interface ProposeFailProps {
   proposerName?: string;
@@ -38,7 +39,7 @@ const ProposeFail: React.FC<ProposeFailProps> = (props) => {
 
   return (
     <_.Container>
-      <_.BackgroundHeart />
+      <_.BackgroundHeart src={HeartBackground} />
 
       <_.ContentWrapper>
         <_.Title>

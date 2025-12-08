@@ -133,6 +133,26 @@ const DestinyResult: React.FC = () => {
             </_.OtherCompatibilityText>
           </_.OtherCompatibilitySection>
         )}
+        <Button
+          body="고백하기"
+          type="pink"
+          onClick={() =>
+            navigate('/propose', {
+              state: {
+                proposerName: currentUser.username,
+                proposerMbti: currentUser.mbti,
+                proposerImage: currentUser.profile_image_url || NormalProfileImg,
+                receiverName: destinyMatch.username,
+                receiverMbti: destinyMatch.mbti,
+                receiverImage: destinyMatch.profile_image_url || NormalProfileImg,
+                compatibilityScore: destinyMatch.compatibility_score,
+                heartRateCompatibility: destinyMatch.heart_rate_score,
+                temperatureCompatibility: destinyMatch.temperature_score,
+                mbtiCompatibility: destinyMatch.mbti_score,
+              },
+            })
+          }
+        />
       </_.ContentWrapper>
     </_.Container>
   );

@@ -11,15 +11,6 @@ const fadeIn = keyframes`
   }
 `;
 
-const heartBeat = keyframes`
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.05);
-  }
-`;
-
 export const Container = styled.div`
   position: relative;
   display: flex;
@@ -35,18 +26,17 @@ export const Container = styled.div`
   overflow: hidden;
 `;
 
-export const BackgroundHeart = styled.div`
+export const BackgroundHeart = styled.div<{ src: string }>`
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 806px;
-  height: 597px;
-  background: url("data:image/svg+xml,%3Csvg width='806' height='597' viewBox='0 0 806 597' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M403 597C403 597 0 447 0 268C0 119 89 0 199 0C284 0 352 59 403 149C454 59 522 0 607 0C717 0 806 119 806 268C806 447 403 597 403 597Z' fill='%23FFB6D1'/%3E%3C/svg%3E")
-    center/contain no-repeat;
-  filter: blur(15px);
-  opacity: 0.2;
-  animation: ${heartBeat} 3s ease-in-out infinite;
+  height: 600px;
+  background-image: url(${props => props.src});
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
   pointer-events: none;
 `;
 
@@ -55,8 +45,7 @@ export const ContentWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 50px;
-  width: 100%;
-  max-width: 458px;
+  width: 841px;
   z-index: 1;
   animation: ${fadeIn} 0.6s ease-out;
 `;
@@ -135,7 +124,7 @@ export const FormSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 14px;
-  width: 100%;
+  width: 520px;
   border-radius: 12px;
 `;
 
@@ -187,7 +176,7 @@ export const ActionSection = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  width: 100%;
+  width: 428px;
 `;
 
 export const SubmitButton = styled.button`

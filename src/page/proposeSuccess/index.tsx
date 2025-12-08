@@ -3,6 +3,7 @@ import * as _ from './style';
 import { useNavigate, useLocation } from 'react-router-dom';
 import normalProfile from '@/assets/normalProfileImg.svg';
 import { useAlert } from '@/contexts/AlertContext';
+import HeartBackground from '@/assets/heartBackground.svg';
 
 interface ProposeSuccessProps {
   proposerName?: string;
@@ -12,28 +13,32 @@ interface ProposeSuccessProps {
   receiverMbti?: string;
   receiverImage?: string;
   compatibilityScore?: number;
-  onSubmit?: (coupleName: string, description: string) => void;
+  onSubmit?: (coupleName: string) => void;
   onSkip?: () => void;
 }
 
-const ProposeSuccess: React.FC<ProposeSuccessProps> = (props) => {
+const ProposeSuccess: React.FC<ProposeSuccessProps> = props => {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as ProposeSuccessProps | null;
   const { showAlert } = useAlert();
 
-  const proposerName = props.proposerName || locationState?.proposerName || '이원희';
-  const proposerMbti = props.proposerMbti || locationState?.proposerMbti || 'ISFP';
-  const proposerImage = props.proposerImage || locationState?.proposerImage || normalProfile;
-  const receiverName = props.receiverName || locationState?.receiverName || '이원희';
-  const receiverMbti = props.receiverMbti || locationState?.receiverMbti || 'ISFP';
-  const receiverImage = props.receiverImage || locationState?.receiverImage || normalProfile;
+  const proposerName =
+    props.proposerName || locationState?.proposerName || '이원희';
+  const proposerMbti =
+    props.proposerMbti || locationState?.proposerMbti || 'ISFP';
+  const proposerImage =
+    props.proposerImage || locationState?.proposerImage || normalProfile;
+  const receiverName =
+    props.receiverName || locationState?.receiverName || '이원희';
+  const receiverMbti =
+    props.receiverMbti || locationState?.receiverMbti || 'ISFP';
+  const receiverImage =
+    props.receiverImage || locationState?.receiverImage || normalProfile;
   const compatibilityScore =
     props.compatibilityScore || locationState?.compatibilityScore || 99;
 
   const [coupleName, setCoupleName] = useState('');
-  const [description, setDescription] = useState('');
-
   const handleSubmit = () => {
     if (!coupleName.trim()) {
       showAlert('커플명을 작성해주세요.');
@@ -41,9 +46,9 @@ const ProposeSuccess: React.FC<ProposeSuccessProps> = (props) => {
     }
 
     if (props.onSubmit || locationState?.onSubmit) {
-      (props.onSubmit || locationState?.onSubmit)?.(coupleName, description);
+      (props.onSubmit || locationState?.onSubmit)?.(coupleName);
     } else {
-      showAlert('등록되었습니다!', `커플명: ${coupleName}\n소개: ${description || '없음'}`);
+      showAlert('등록되었습니다!', `커플명: ${coupleName}`);
       navigate('/');
     }
   };
@@ -58,7 +63,7 @@ const ProposeSuccess: React.FC<ProposeSuccessProps> = (props) => {
 
   return (
     <_.Container>
-      <_.BackgroundHeart />
+      <_.BackgroundHeart src={HeartBackground} />
 
       <_.ContentWrapper>
         <_.Title>
@@ -96,17 +101,7 @@ const ProposeSuccess: React.FC<ProposeSuccessProps> = (props) => {
               type="text"
               placeholder="우리만의 특별한 커플명을 작성해주세요!"
               value={coupleName}
-              onChange={(e) => setCoupleName(e.target.value)}
-            />
-          </_.InputGroup>
-
-          <_.InputGroup>
-            <_.Label>한줄 소개 작성하기</_.Label>
-            <_.Input
-              type="text"
-              placeholder="ex) 부산소마고 역대 최강의 레전드 커플"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setCoupleName(e.target.value)}
             />
           </_.InputGroup>
         </_.FormSection>
