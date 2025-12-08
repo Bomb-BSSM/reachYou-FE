@@ -5,9 +5,12 @@ import normalProfile from '@/assets/normalProfileImg.svg';
 import HeartBackground from '@/assets/heartBackground.svg';
 
 interface ProposeProps {
+  origin?: 'destiny' | 'compatibility';
+  proposerId?: number;
   proposerName?: string;
   proposerMbti?: string;
   proposerImage?: string;
+  receiverId?: number;
   receiverName?: string;
   receiverMbti?: string;
   receiverImage?: string;
@@ -24,12 +27,15 @@ const Propose: React.FC<ProposeProps> = props => {
   const location = useLocation();
   const locationState = location.state as ProposeProps | null;
 
+  const origin = props.origin || locationState?.origin || 'compatibility';
+  const proposerId = props.proposerId || locationState?.proposerId || 1;
   const proposerName =
     props.proposerName || locationState?.proposerName || '이원희';
   const proposerMbti =
     props.proposerMbti || locationState?.proposerMbti || 'ISFP';
   const proposerImage =
     props.proposerImage || locationState?.proposerImage || normalProfile;
+  const receiverId = props.receiverId || locationState?.receiverId || 2;
   const receiverName =
     props.receiverName || locationState?.receiverName || '이원희';
   const receiverMbti =
@@ -53,9 +59,12 @@ const Propose: React.FC<ProposeProps> = props => {
     } else {
       navigate('/propose-success', {
         state: {
+          origin,
+          proposerId,
           proposerName,
           proposerMbti,
           proposerImage,
+          receiverId,
           receiverName,
           receiverMbti,
           receiverImage,
@@ -71,6 +80,7 @@ const Propose: React.FC<ProposeProps> = props => {
     } else {
       navigate('/propose-fail', {
         state: {
+          origin,
           proposerName,
           proposerMbti,
           proposerImage,

@@ -34,7 +34,23 @@ const Result: React.FC = () => {
   };
 
   const handleConfess = () => {
-    // TODO: 고백하기 기능 구현
+    navigate('/propose', {
+      state: {
+        origin: 'compatibility',
+        proposerId: profile1.user_id,
+        proposerName: profile1.username,
+        proposerMbti: profile1.mbti,
+        proposerImage: profile1.profile_image_url || NormalPofileImg,
+        receiverId: profile2.user_id,
+        receiverName: profile2.username,
+        receiverMbti: profile2.mbti,
+        receiverImage: profile2.profile_image_url || NormalPofileImg,
+        compatibilityScore: compatibilityScore,
+        heartRateCompatibility: 99,
+        temperatureCompatibility: 88,
+        mbtiCompatibility: 95,
+      },
+    });
   };
 
   return (

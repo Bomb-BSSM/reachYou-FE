@@ -5,6 +5,7 @@ import normalProfile from '@/assets/normalProfileImg.svg';
 import HeartBackground from '@/assets/heartBackground.svg';
 
 interface ProposeFailProps {
+  origin?: 'destiny' | 'compatibility';
   proposerName?: string;
   proposerMbti?: string;
   proposerImage?: string;
@@ -20,6 +21,7 @@ const ProposeFail: React.FC<ProposeFailProps> = (props) => {
   const location = useLocation();
   const locationState = location.state as ProposeFailProps | null;
 
+  const origin = props.origin || locationState?.origin || 'compatibility';
   const proposerName = props.proposerName || locationState?.proposerName || '이원희';
   const proposerMbti = props.proposerMbti || locationState?.proposerMbti || 'ISFP';
   const proposerImage = props.proposerImage || locationState?.proposerImage || normalProfile;
@@ -33,7 +35,11 @@ const ProposeFail: React.FC<ProposeFailProps> = (props) => {
     if (props.onGoBack || locationState?.onGoBack) {
       (props.onGoBack || locationState?.onGoBack)?.();
     } else {
-      navigate('/');
+      if (origin === 'destiny') {
+        navigate('/destiny-finder/list');
+      } else {
+        navigate('/');
+      }
     }
   };
 

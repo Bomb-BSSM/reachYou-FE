@@ -45,11 +45,5 @@ const addCouple = async ({
 export const useAddCouple = () => {
   return useMutation({
     mutationFn: addCouple,
-    onSuccess: (data) => {
-      console.log('커플 생성 성공:', data);
-    },
-    onError: (error) => {
-      console.error('커플 생성 실패:', error);
-    },
   });
 };

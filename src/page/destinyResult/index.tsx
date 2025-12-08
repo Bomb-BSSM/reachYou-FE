@@ -139,9 +139,12 @@ const DestinyResult: React.FC = () => {
           onClick={() =>
             navigate('/propose', {
               state: {
+                origin: 'destiny',
+                proposerId: result.user_id,
                 proposerName: currentUser.username,
                 proposerMbti: currentUser.mbti,
                 proposerImage: currentUser.profile_image_url || NormalProfileImg,
+                receiverId: destinyMatch.user_id,
                 receiverName: destinyMatch.username,
                 receiverMbti: destinyMatch.mbti,
                 receiverImage: destinyMatch.profile_image_url || NormalProfileImg,
