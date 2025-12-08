@@ -14,7 +14,8 @@ interface calculateProps {
 const calculateDestinyAll = async ({ user_length }: calculateProps) => {
   try {
     const response = await axios.post<calculateResponse>(
-      `/api/fated-match/calculate-all/${user_length}`
+      `/api/fated-match/calculate-recent/${user_length}`,
+      {}
     );
     return response.data;
   } catch (error) {
@@ -26,5 +27,6 @@ const calculateDestinyAll = async ({ user_length }: calculateProps) => {
 export const useCalculateDestinyAll = () => {
   return useMutation({
     mutationFn: (user_length: number) => calculateDestinyAll({ user_length }),
+    onError: () => console.log('운명의 상대 전체 계산 실패'),
   });
 };
