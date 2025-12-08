@@ -298,3 +298,20 @@ export const CommentTime = styled.p`
   margin: 0;
   white-space: nowrap;
 `;
+
+export const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 100px;
+`;
+
+export const LoadingText = styled.p`
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text};
+  margin: 0;
+`;

@@ -6,7 +6,6 @@ import sendBtn from '@/assets/sendBtnActive.svg';
 import Button from '@/components/button';
 import { useAlert } from '@/contexts/AlertContext';
 import { formatRelativeTime, getCurrentDate } from '@/utils/date';
-import dayjs from 'dayjs';
 import { useGetCouple } from '@/api/couples/getCouple';
 import LoadingSpinner from '@/components/loadingSpinner';
 import { useAddStarScope } from '@/api/couples/addStarScope';
@@ -18,40 +17,31 @@ interface Comment {
   createdAt: string;
 }
 
-interface RankingDetailProps {
+interface LocationState {
   coupleId?: number;
-  coupleName?: string;
-  person1?: {
-    name: string;
-    mbti: string;
-    image: string;
-  };
-  person2?: {
-    name: string;
-    mbti: string;
-    image: string;
-  };
-  score?: number;
-  rating?: number;
-  heartRateScore?: number;
-  temperatureScore?: number;
-  mbtiCompatibility?: number;
 }
 
-const RankingDetail: React.FC<RankingDetailProps> = props => {
+const RankingDetail: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const locationState = location.state as RankingDetailProps | null;
+  const locationState = location.state as LocationState | null;
   const { showAlert } = useAlert();
   const addStarScopeMutation = useAddStarScope();
 
-  const coupleId = props.coupleId || locationState?.coupleId;
+  const coupleId = locationState?.coupleId;
   const { data, isLoading, isError } = useGetCouple({
     couple_id: coupleId || 0,
   });
 
   useEffect(() => {
-    if (isError || (!isLoading && !data && !coupleId)) {
+    if (!coupleId) {
+      showAlert('잘못된 접근입니다.', '랭킹 페이지로 돌아갑니다.', () => {
+        navigate('/ranking');
+      });
+      return;
+    }
+
+    if (isError) {
       showAlert(
         '데이터를 불러오는데 실패했습니다.',
         '잠시 후 다시 시도해주세요.',
@@ -60,12 +50,11 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
         }
       );
     }
-  }, [isError, isLoading, data, coupleId, navigate, showAlert]);
+  }, [isError, coupleId, navigate, showAlert]);
 
-  // API 데이터 또는 fallback 사용
   const coupleName = data
     ? `${data.user_a.username} & ${data.user_b.username}`
-    : props.coupleName || locationState?.coupleName || '둠칫냐옹';
+    : '';
 
   const person1 = data
     ? {
@@ -73,12 +62,7 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
         mbti: data.user_a.mbti,
         image: data.user_a.profile_image_url || normalProfile,
       }
-    : props.person1 ||
-      locationState?.person1 || {
-        name: '이원희',
-        mbti: 'ISFP',
-        image: normalProfile,
-      };
+    : { name: '', mbti: '', image: normalProfile };
 
   const person2 = data
     ? {
@@ -86,24 +70,15 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
         mbti: data.user_b.mbti,
         image: data.user_b.profile_image_url || normalProfile,
       }
-    : props.person2 ||
-      locationState?.person2 || {
-        name: '이로하',
-        mbti: 'INFJ',
-        image: normalProfile,
-      };
+    : { name: '', mbti: '', image: normalProfile };
 
-  const score = data?.score || props.score || locationState?.score || 99;
-  const rating =
-    data?.average_rating || props.rating || locationState?.rating || 4;
+  const score = data?.score || 0;
+  const rating = data?.average_rating || 0;
 
-  // 센서 데이터는 API에서 제공하지 않으므로 기존 방식 유지
-  const heartRateScore =
-    props.heartRateScore || locationState?.heartRateScore || 99;
-  const temperatureScore =
-    props.temperatureScore || locationState?.temperatureScore || 88;
-  const mbtiCompatibility =
-    props.mbtiCompatibility || locationState?.mbtiCompatibility || 95;
+  // 센서 데이터는 API에서 제공하지 않으므로 기본값 사용
+  const heartRateScore = 99;
+  const temperatureScore = 88;
+  const mbtiCompatibility = 95;
 
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -119,6 +94,10 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
   };
 
   const handleSubmitComment = () => {
+    if (!coupleId) {
+      showAlert('커플 정보를 찾을 수 없습니다.');
+      return;
+    }
     if (userRating === 0) {
       showAlert('별점을 선택해주세요.');
       return;
@@ -130,7 +109,7 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
     addStarScopeMutation.mutate(
       {
         couple_id: coupleId,
-        rating: rating,
+        rating: userRating,
         comment: commentText,
       },
       {
@@ -143,13 +122,32 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
           };
           setComments([newComment, ...comments]);
         },
-        onError: () => showAlert('댓글이 등록되지 않았습니다.'),
+        onError: () => showAlert('댓글이 등록되지 않습니다.'),
       }
     );
 
     setUserRating(0);
     setCommentText('');
   };
+
+  if (isLoading) {
+    return (
+      <_.Container>
+        <_.ContentWrapper>
+          <_.Header>
+            <_.HeaderLeft>
+              <_.CoupleLabel>Couple</_.CoupleLabel>
+            </_.HeaderLeft>
+            <Button body="돌아가기" type="pink" onClick={handleBack} />
+          </_.Header>
+          <_.LoadingContainer>
+            <LoadingSpinner size={60} />
+            <_.LoadingText>로딩 중...</_.LoadingText>
+          </_.LoadingContainer>
+        </_.ContentWrapper>
+      </_.Container>
+    );
+  }
 
   return (
     <_.Container>

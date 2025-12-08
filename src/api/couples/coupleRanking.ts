@@ -14,8 +14,9 @@ interface CoupleRankingItem {
   user_a: UserInfo;
   user_b: UserInfo;
   score: number;
+  average_rating: number;
+  rating_count: number;
   couple_name: string;
-  post_count: number;
   created_at: string;
 }
 
