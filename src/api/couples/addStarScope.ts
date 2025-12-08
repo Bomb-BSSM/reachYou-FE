@@ -3,6 +3,7 @@ import axios from 'axios';
 
 interface AddStarScopeRequest {
   couple_id: number;
+  user_id: number;
   rating: number;
   comment: string;
 }
@@ -31,6 +32,7 @@ interface AddStarScopeResponse {
 
 const addStarScope = async ({
   couple_id,
+  user_id,
   rating,
   comment,
 }: AddStarScopeRequest) => {
@@ -39,6 +41,7 @@ const addStarScope = async ({
       `/api/couples/${couple_id}/rating`,
       {
         couple_id,
+        user_id,
         rating,
         comment,
       }
