@@ -173,8 +173,8 @@ const HeartRateMeasure = () => {
     }
   };
 
-  const handleViewResult = (userId: number) => {
-    navigate('/result', { state: { userId } });
+  const handleViewResult = () => {
+    navigate('/result');
   };
 
   return (
@@ -184,9 +184,10 @@ const HeartRateMeasure = () => {
           <_.MainHeader>
             <_.HeaderTextArea>
               <_.HeaderText color="black">
-                각자의 결과를 확인해보세요!
+                측정이 완료되었습니다!
               </_.HeaderText>
             </_.HeaderTextArea>
+            <Button body="궁합 보기" type="pink" onClick={handleViewResult} />
           </_.MainHeader>
 
           <_.ResultCardsGrid>
@@ -197,9 +198,7 @@ const HeartRateMeasure = () => {
                 temperature={profile.temperature || 36.5}
                 heartRate={profile.heartRate || 99}
                 measurementStatus="completed"
-                showButton={true}
-                buttonText="확인하기"
-                onButtonClick={() => handleViewResult(profile.user_id)}
+                showButton={false}
               />
             ))}
           </_.ResultCardsGrid>
