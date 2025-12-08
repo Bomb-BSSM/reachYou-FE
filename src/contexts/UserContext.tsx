@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 
 export interface Profile {
   user_id: number;
@@ -30,35 +30,41 @@ export const ProfilesProvider: React.FC<{ children: React.ReactNode }> = ({
     return saved ? JSON.parse(saved) : [];
   });
 
-  const addProfile = (profile: Profile) => {
-    const updated = [...profiles, profile];
-    setProfiles(updated);
-    sessionStorage.setItem('profiles', JSON.stringify(updated));
-  };
+  const addProfile = useCallback((profile: Profile) => {
+    setProfiles(prevProfiles => {
+      const updated = [...prevProfiles, profile];
+      sessionStorage.setItem('profiles', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const updateProfile = (userId: number, data: Partial<Profile>) => {
-    const updated = profiles.map(p =>
-      p.user_id === userId ? { ...p, ...data } : p
-    );
-    setProfiles(updated);
-    sessionStorage.setItem('profiles', JSON.stringify(updated));
-  };
+  const updateProfile = useCallback((userId: number, data: Partial<Profile>) => {
+    setProfiles(prevProfiles => {
+      const updated = prevProfiles.map(p =>
+        p.user_id === userId ? { ...p, ...data } : p
+      );
+      sessionStorage.setItem('profiles', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const removeProfile = (userId: number) => {
-    const updated = profiles.filter(p => p.user_id !== userId);
-    setProfiles(updated);
-    sessionStorage.setItem('profiles', JSON.stringify(updated));
-  };
+  const removeProfile = useCallback((userId: number) => {
+    setProfiles(prevProfiles => {
+      const updated = prevProfiles.filter(p => p.user_id !== userId);
+      sessionStorage.setItem('profiles', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const clearProfiles = () => {
+  const clearProfiles = useCallback(() => {
     setProfiles([]);
     sessionStorage.removeItem('profiles');
-  };
+  }, []);
 
-  const setAllProfiles = (newProfiles: Profile[]) => {
+  const setAllProfiles = useCallback((newProfiles: Profile[]) => {
     setProfiles(newProfiles);
     sessionStorage.setItem('profiles', JSON.stringify(newProfiles));
-  };
+  }, []);
 
   return (
     <ProfilesContext.Provider

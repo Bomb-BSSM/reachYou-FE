@@ -117,7 +117,6 @@ const HeartRateMeasure = () => {
     }
   }, [measurementStatus, shouldUseMockData, latestMessage, error]);
 
-  // 컴포넌트 언마운트 시 웹소켓 연결 해제
   useEffect(() => {
     return () => {
       disconnect();
@@ -128,22 +127,18 @@ const HeartRateMeasure = () => {
   }, [disconnect]);
 
   const handleStartMeasurement = () => {
-    // 재측정인 경우 기존 연결 종료
     disconnect();
 
-    // 측정 상태 즉시 변경 (웹소켓 연결 시작)
     setMeasurementStatus('measuring');
     setHeartRate(0);
     setTemperature(0);
     setShouldUseMockData(false);
 
-    // API 호출 (웹소켓과 동시 진행)
     measureSensorMutation.mutate(
       { user_id: currentProfile.user_id },
       {
         onError: () => {
           showAlert('센서 측정이 실패했습니다.');
-          // API 실패해도 웹소켓으로 측정 시도 또는 목 데이터 사용
         },
       }
     );
@@ -183,9 +178,7 @@ const HeartRateMeasure = () => {
         <>
           <_.MainHeader>
             <_.HeaderTextArea>
-              <_.HeaderText color="black">
-                측정이 완료되었습니다!
-              </_.HeaderText>
+              <_.HeaderText color="black">측정이 완료되었습니다!</_.HeaderText>
             </_.HeaderTextArea>
             <Button body="궁합 보기" type="pink" onClick={handleViewResult} />
           </_.MainHeader>
