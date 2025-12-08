@@ -64,7 +64,11 @@ const ProposeSuccess: React.FC<ProposeSuccessProps> = props => {
         {
           onSuccess: () => {
             showAlert('등록되었습니다!', `커플명: ${coupleName}`);
-            navigate('/');
+            if (origin === 'destiny') {
+              navigate('/destiny-finder/list');
+            } else {
+              navigate('/');
+            }
           },
           onError: error => {
             console.error('커플 등록 실패:', error);

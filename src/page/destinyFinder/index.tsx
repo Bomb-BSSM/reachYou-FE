@@ -28,6 +28,8 @@ const DestinyFinder = () => {
 
   useEffect(() => {
     clearProfiles();
+    // 운명찾기 처음 페이지로 돌아오면 결과 계산 플래그도 초기화
+    sessionStorage.removeItem('destiny_result_calculated');
   }, []);
 
   const handleAddProfile = () => {
