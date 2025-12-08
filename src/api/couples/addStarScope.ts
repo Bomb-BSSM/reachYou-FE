@@ -38,6 +38,7 @@ const addStarScope = async ({
     const response = await axios.put<AddStarScopeResponse>(
       `/api/couples/${couple_id}/rating`,
       {
+        couple_id,
         rating,
         comment,
       }
@@ -45,9 +46,6 @@ const addStarScope = async ({
     return response.data;
   } catch (error) {
     console.error('별점 추가 실패: ', error);
-    if (axios.isAxiosError(error) && error.response) {
-      console.error('에러 응답:', error.response.data);
-    }
     throw error;
   }
 };
