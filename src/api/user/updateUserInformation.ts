@@ -7,7 +7,7 @@ interface updateUserInforInterface {
   mbti: string;
   profile_image_url?: string;
 }
-const updateUserInformatioin = async ({
+const updateUserInformation = async ({
   user_id,
   username,
   mbti,
@@ -15,18 +15,19 @@ const updateUserInformatioin = async ({
 }: updateUserInforInterface) => {
   try {
     await axios.put(`/api/users/${user_id}`, {
-      username: username,
-      mbti: mbti,
-      profile_image_url: profile_image_url,
+      username,
+      mbti,
+      profile_image_url,
     });
   } catch (error) {
     console.error('사용자 정보 수정 실패: ', error);
+    throw error;
   }
 };
 
 export const useUpdateUserInformation = () => {
   return useMutation({
-    mutationFn: updateUserInformatioin,
+    mutationFn: updateUserInformation,
     onError: () => console.log('사용자 정보 수정 오류'),
   });
 };

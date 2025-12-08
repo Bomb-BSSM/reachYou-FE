@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import Input from '@/components/input';
@@ -11,9 +11,10 @@ import { useCreateUserInformation } from '@/api/user/createUserInformation';
 import { useUpdateUserInformation } from '@/api/user/updateUserInformation';
 import { useDeleteUserInformation } from '@/api/user/deleteUserInformation';
 import { useProfiles } from '@/contexts/UserContext';
+import { useAlert } from '@/contexts/AlertContext';
 
 const DestinyFinder = () => {
-  const { profiles, addProfile, updateProfile, removeProfile } = useProfiles();
+  const { profiles, addProfile, updateProfile, removeProfile, clearProfiles } = useProfiles();
 
   const navigate = useNavigate();
   const [imageSrc, setImageSrc] = useState<string>('');
@@ -23,10 +24,17 @@ const DestinyFinder = () => {
   const createUserMutation = useCreateUserInformation();
   const updateUserMutation = useUpdateUserInformation();
   const deleteUserMutation = useDeleteUserInformation();
+  const { showAlert } = useAlert();
+
+  useEffect(() => {
+    clearProfiles();
+    // 운명찾기 처음 페이지로 돌아오면 결과 계산 플래그도 초기화
+    sessionStorage.removeItem('destiny_result_calculated');
+  }, []);
 
   const handleAddProfile = () => {
     if (profiles.length >= 8) {
-      alert('프로필의 최대 개수는 8개 입니다.');
+      showAlert('프로필의 최대 개수는 8개 입니다.');
       setName('');
       setMbti('');
       setImageSrc('');
@@ -102,14 +110,14 @@ const DestinyFinder = () => {
       { user_id: userId },
       {
         onSuccess: () => removeProfile(userId),
-        onError: () => alert('프로필 삭제가 삭제 되었습니다.'),
+        onError: () => showAlert('프로필이 삭제 되지 않았습니다.'),
       }
     );
   };
 
   const handleNext = () => {
     if (profiles.length < 3) {
-      alert('프로필 갯수는 최소 3개 이상입니다.');
+      showAlert('프로필 갯수는 최소 3개 이상입니다.');
       return;
     }
     navigate('/destiny-finder/list');

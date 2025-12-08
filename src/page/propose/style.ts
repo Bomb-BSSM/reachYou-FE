@@ -1,24 +1,4 @@
-import styled, { keyframes } from 'styled-components';
-
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
-const heartBeat = keyframes`
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.05);
-  }
-`;
+import styled from 'styled-components';
 
 export const Container = styled.div`
   position: relative;
@@ -35,18 +15,17 @@ export const Container = styled.div`
   overflow: hidden;
 `;
 
-export const BackgroundHeart = styled.div`
+export const BackgroundHeart = styled.div<{ src: string }>`
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 806px;
-  height: 597px;
-  background: url("data:image/svg+xml,%3Csvg width='806' height='597' viewBox='0 0 806 597' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M403 597C403 597 0 447 0 268C0 119 89 0 199 0C284 0 352 59 403 149C454 59 522 0 607 0C717 0 806 119 806 268C806 447 403 597 403 597Z' fill='%23FFB6D1'/%3E%3C/svg%3E")
-    center/contain no-repeat;
-  filter: blur(15px);
-  opacity: 0.2;
-  animation: ${heartBeat} 3s ease-in-out infinite;
+  height: 600px;
+  background-image: url(${props => props.src});
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
   pointer-events: none;
 `;
 
@@ -57,7 +36,6 @@ export const ContentWrapper = styled.div`
   gap: 50px;
   width: 841px;
   z-index: 1;
-  animation: ${fadeIn} 0.6s ease-out;
 `;
 
 export const Title = styled.p`
@@ -73,20 +51,20 @@ export const Title = styled.p`
 export const ProfileSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 102px;
+  gap: 60px;
 `;
 
 export const ProfileCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 32px;
+  gap: 16px;
   width: 160px;
 `;
 
 export const ProfileImageWrapper = styled.div`
-  width: 160px;
-  height: 160px;
+  width: 120px;
+  height: 120px;
   border-radius: 100px;
   overflow: hidden;
   position: relative;
@@ -104,7 +82,7 @@ export const ProfileInfo = styled.div`
   align-items: center;
   gap: 20px;
   font-family: 'Paperlogy', sans-serif;
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 600;
   line-height: normal;
   color: ${({ theme }) => theme.colors.black};
@@ -168,17 +146,15 @@ export const AcceptButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 200px;
-  height: 49px;
-  padding: 14px 20px;
-  gap: 10px;
+  width: 180px;
+  padding: 12px 16px;
   background: ${({ theme }) => theme.colors.secondary};
   border: 1px solid ${({ theme }) => theme.colors.primary};
   border-radius: 4px;
   box-sizing: border-box;
 
   font-family: 'Paperlogy', sans-serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   line-height: normal;
   color: ${({ theme }) => theme.colors.primary};
@@ -199,16 +175,15 @@ export const RejectButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 200px;
-  padding: 14px 20px;
-  gap: 10px;
+  width: 180px;
+  padding: 12px 16px;
   background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.primary};
   border-radius: 4px;
   box-sizing: border-box;
 
   font-family: 'Paperlogy', sans-serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   line-height: normal;
   color: ${({ theme }) => theme.colors.primary};
