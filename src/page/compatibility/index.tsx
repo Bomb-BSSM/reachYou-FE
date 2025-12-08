@@ -61,14 +61,23 @@ const Compatibility: React.FC = () => {
     );
   }, []);
 
-  const handleEditProfile = (userId: number, name: string, mbti: string, profileImg?: string) => {
+  const handleEditProfile = (
+    userId: number,
+    name: string,
+    mbti: string,
+    profileImg?: string
+  ) => {
     updateUserMutation.mutate({
       user_id: userId,
       username: name,
       mbti: mbti,
       profile_image_url: profileImg,
     });
-    updateProfile(userId, { username: name, mbti, profile_image_url: profileImg });
+    updateProfile(userId, {
+      username: name,
+      mbti,
+      profile_image_url: profileImg,
+    });
   };
 
   const handleImageChange = (userId: number, imageUrl: string) => {

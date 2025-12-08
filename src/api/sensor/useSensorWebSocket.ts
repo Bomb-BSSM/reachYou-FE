@@ -54,73 +54,6 @@ export const useSensorWebSocket = (
     optionsRef.current = options;
   }, [options]);
 
-  const connect = useCallback(() => {
-    if (!userId || wsRef.current?.readyState === WebSocket.OPEN) {
-      return;
-    }
-
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/api/fated-match/ws/measure/${userId}`;
-
-    try {
-      const ws = new WebSocket(wsUrl);
-
-      ws.onopen = () => {
-        queueMicrotask(() => {
-          setIsConnected(true);
-          setError(null);
-        });
-        optionsRef.current?.onConnect?.();
-      };
-
-      ws.onmessage = event => {
-        try {
-          const message: SensorMessage = JSON.parse(event.data);
-          queueMicrotask(() => {
-            setLatestMessage(message);
-          });
-          optionsRef.current?.onMessage?.(message);
-
-          if (message.status === 'complete' && message.result) {
-            optionsRef.current?.onComplete?.(message.result);
-          } else if (message.status === 'error') {
-            queueMicrotask(() => {
-              setError(message.message);
-            });
-            optionsRef.current?.onError?.(message.message);
-          }
-        } catch (err) {
-          console.error('웹소켓 메시지 파싱 실패:', err);
-        }
-      };
-
-      ws.onerror = event => {
-        console.error('웹소켓 에러:', event);
-        const errorMessage = '웹소켓 연결 오류가 발생했습니다.';
-        queueMicrotask(() => {
-          setError(errorMessage);
-        });
-        optionsRef.current?.onError?.(errorMessage);
-      };
-
-      ws.onclose = () => {
-        queueMicrotask(() => {
-          setIsConnected(false);
-        });
-        optionsRef.current?.onDisconnect?.();
-      };
-
-      wsRef.current = ws;
-    } catch (err) {
-      console.error('웹소켓 연결 실패:', err);
-      const errorMessage = '웹소켓 연결에 실패했습니다.';
-      queueMicrotask(() => {
-        setError(errorMessage);
-      });
-      optionsRef.current?.onError?.(errorMessage);
-    }
-  }, [userId]);
-
   const disconnect = useCallback(() => {
     if (wsRef.current) {
       wsRef.current.close();
@@ -218,7 +151,6 @@ export const useSensorWebSocket = (
     isConnected,
     latestMessage,
     error,
-    connect,
     disconnect,
   };
 };

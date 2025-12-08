@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as _ from './style';
 import { useNavigate, useLocation } from 'react-router-dom';
 import normalProfile from '@/assets/normalProfileImg.svg';
@@ -6,7 +6,9 @@ import sendBtn from '@/assets/sendBtnActive.svg';
 import Button from '@/components/button';
 import { useAlert } from '@/contexts/AlertContext';
 import { formatRelativeTime, getCurrentDate } from '@/utils/date';
-import dayjs from 'dayjs';
+import { useGetCouple } from '@/api/couples/getCouple';
+import LoadingSpinner from '@/components/loadingSpinner';
+import { useAddStarScope } from '@/api/couples/addStarScope';
 
 interface Comment {
   id: number;
@@ -15,71 +17,73 @@ interface Comment {
   createdAt: string;
 }
 
-interface RankingDetailProps {
-  coupleName?: string;
-  person1?: {
-    name: string;
-    mbti: string;
-    image: string;
-  };
-  person2?: {
-    name: string;
-    mbti: string;
-    image: string;
-  };
-  score?: number;
-  rating?: number;
-  heartRateScore?: number;
-  temperatureScore?: number;
-  mbtiCompatibility?: string;
+interface LocationState {
+  coupleId?: number;
 }
 
-const RankingDetail: React.FC<RankingDetailProps> = props => {
+const RankingDetail: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const locationState = location.state as RankingDetailProps | null;
+  const locationState = location.state as LocationState | null;
   const { showAlert } = useAlert();
+  const addStarScopeMutation = useAddStarScope();
 
-  const coupleName =
-    props.coupleName || locationState?.coupleName || '둠칫냐옹';
-  const person1 = props.person1 ||
-    locationState?.person1 || {
-      name: '이원희',
-      mbti: 'ISFP',
-      image: normalProfile,
-    };
-  const person2 = props.person2 ||
-    locationState?.person2 || {
-      name: '이로하',
-      mbti: 'INFJ',
-      image: normalProfile,
-    };
-  const score = props.score || locationState?.score || 99;
-  const rating = props.rating || locationState?.rating || 4;
-  const heartRateScore =
-    props.heartRateScore || locationState?.heartRateScore || 99;
-  const temperatureScore =
-    props.temperatureScore || locationState?.temperatureScore || 88;
-  const mbtiCompatibility =
-    props.mbtiCompatibility || locationState?.mbtiCompatibility || '매우 좋은';
+  const coupleId = locationState?.coupleId;
+  const { data, isLoading, isError } = useGetCouple({
+    couple_id: coupleId || 0,
+  });
+
+  useEffect(() => {
+    if (!coupleId) {
+      showAlert('잘못된 접근입니다.', '랭킹 페이지로 돌아갑니다.', () => {
+        navigate('/ranking');
+      });
+      return;
+    }
+
+    if (isError) {
+      showAlert(
+        '데이터를 불러오는데 실패했습니다.',
+        '잠시 후 다시 시도해주세요.',
+        () => {
+          navigate('/ranking');
+        }
+      );
+    }
+  }, [isError, coupleId, navigate, showAlert]);
+
+  const coupleName = data
+    ? `${data.user_a.username} & ${data.user_b.username}`
+    : '';
+
+  const person1 = data
+    ? {
+        name: data.user_a.username,
+        mbti: data.user_a.mbti,
+        image: data.user_a.profile_image_url || normalProfile,
+      }
+    : { name: '', mbti: '', image: normalProfile };
+
+  const person2 = data
+    ? {
+        name: data.user_b.username,
+        mbti: data.user_b.mbti,
+        image: data.user_b.profile_image_url || normalProfile,
+      }
+    : { name: '', mbti: '', image: normalProfile };
+
+  const score = data?.score || 0;
+  const rating = data?.average_rating || 0;
+
+  // 센서 데이터는 API에서 제공하지 않으므로 기본값 사용
+  const heartRateScore = 99;
+  const temperatureScore = 88;
+  const mbtiCompatibility = 95;
 
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState<Comment[]>([
-    {
-      id: 1,
-      rating: 4,
-      text: '천진난만한 이런 기분도 신이 나서 날아갈 정도로 웃었던 날도 사랑스럽고 소중하게 피울 수 있도록 ㅠㅠ\n너무 귀엽다!!',
-      createdAt: dayjs().subtract(1, 'day').toISOString(),
-    },
-    {
-      id: 2,
-      rating: 4,
-      text: '꿍실 냐옹',
-      createdAt: dayjs().subtract(2, 'minute').toISOString(),
-    },
-  ]);
+  const [comments, setComments] = useState<Comment[]>([]);
 
   const handleBack = () => {
     navigate('/ranking');
@@ -90,6 +94,10 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
   };
 
   const handleSubmitComment = () => {
+    if (!coupleId) {
+      showAlert('커플 정보를 찾을 수 없습니다.');
+      return;
+    }
     if (userRating === 0) {
       showAlert('별점을 선택해주세요.');
       return;
@@ -98,18 +106,48 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
       showAlert('댓글을 작성해주세요.');
       return;
     }
+    addStarScopeMutation.mutate(
+      {
+        couple_id: coupleId,
+        rating: userRating,
+        comment: commentText,
+      },
+      {
+        onSuccess: () => {
+          const newComment: Comment = {
+            id: comments.length + 1,
+            rating: userRating,
+            text: commentText,
+            createdAt: getCurrentDate(),
+          };
+          setComments([newComment, ...comments]);
+        },
+        onError: () => showAlert('댓글이 등록되지 않습니다.'),
+      }
+    );
 
-    const newComment: Comment = {
-      id: comments.length + 1,
-      rating: userRating,
-      text: commentText,
-      createdAt: getCurrentDate(),
-    };
-
-    setComments([newComment, ...comments]);
     setUserRating(0);
     setCommentText('');
   };
+
+  if (isLoading) {
+    return (
+      <_.Container>
+        <_.ContentWrapper>
+          <_.Header>
+            <_.HeaderLeft>
+              <_.CoupleLabel>Couple</_.CoupleLabel>
+            </_.HeaderLeft>
+            <Button body="돌아가기" type="pink" onClick={handleBack} />
+          </_.Header>
+          <_.LoadingContainer>
+            <LoadingSpinner size={60} />
+            <_.LoadingText>로딩 중...</_.LoadingText>
+          </_.LoadingContainer>
+        </_.ContentWrapper>
+      </_.Container>
+    );
+  }
 
   return (
     <_.Container>
@@ -168,8 +206,8 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
             </_.AnalysisText>
             <_.AnalysisText>
               {person1.name} 님과 {person2.name} 님은{' '}
-              <_.Highlight>MBTI</_.Highlight>의 궁합이 {mbtiCompatibility}{' '}
-              편입니다!
+              <_.Highlight>MBTI</_.Highlight>는 {mbtiCompatibility}%로
+              유사했습니다!
             </_.AnalysisText>
           </_.AnalysisBox>
         </_.AnalysisSection>

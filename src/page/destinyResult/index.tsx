@@ -1,35 +1,43 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
 import NormalProfileImg from '@/assets/normalProfileImg.svg';
 import HeartBackground from '@/assets/heartBackground.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useGetFinderDestiny } from '@/api/findDestiny/getFindDestiny';
+import LoadingSpinner from '@/components/loadingSpinner';
+import { useAlert } from '@/contexts/AlertContext';
 
 const DestinyResult: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const userId = location.state?.userId;
+  const { showAlert } = useAlert();
 
   const { data, isLoading, isError } = useGetFinderDestiny({ user_id: userId });
+
+  useEffect(() => {
+    if (isError || (!isLoading && !data)) {
+      showAlert('데이터를 불러오는데 실패했습니다.', '잠시 후 다시 시도해주세요.', () => {
+        navigate('/destiny-finder/list');
+      });
+    }
+  }, [isError, isLoading, data, navigate, showAlert]);
 
   const handleBack = () => {
     navigate('/destiny-finder/list');
   };
 
-  if (isLoading) {
+  if (isLoading || isError || !data) {
     return (
       <_.Container>
-        <_.LoadingText>로딩 중...</_.LoadingText>
-      </_.Container>
-    );
-  }
-
-  if (isError || !data) {
-    return (
-      <_.Container>
-        <_.ErrorText>데이터를 불러오는데 실패했습니다.</_.ErrorText>
-        <Button body="돌아가기" type="pink" onClick={handleBack} />
+        <_.HeartBackground src={HeartBackground} />
+        {isLoading && (
+          <_.LoadingContainer>
+            <LoadingSpinner size={60} />
+            <_.LoadingText>로딩 중...</_.LoadingText>
+          </_.LoadingContainer>
+        )}
       </_.Container>
     );
   }
