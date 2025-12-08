@@ -177,6 +177,18 @@ export const OtherCompatibilityText = styled.p`
   margin: 0;
 `;
 
+export const LoadingContainer = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  z-index: 10;
+`;
+
 export const LoadingText = styled.p`
   font-family: 'Paperlogy', sans-serif;
   font-size: 18px;
