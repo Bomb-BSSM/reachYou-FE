@@ -130,7 +130,7 @@ const Ranking: React.FC<RankingProps> = ({ rankings }) => {
         rating: item.rating,
         heartRateScore: 99,
         temperatureScore: 88,
-        mbtiCompatibility: '매우 좋은',
+        mbtiCompatibility: 95,
       },
     });
   };

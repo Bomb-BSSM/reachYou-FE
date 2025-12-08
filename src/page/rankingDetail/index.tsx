@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as _ from './style';
 import { useNavigate, useLocation } from 'react-router-dom';
 import normalProfile from '@/assets/normalProfileImg.svg';
@@ -7,6 +7,9 @@ import Button from '@/components/button';
 import { useAlert } from '@/contexts/AlertContext';
 import { formatRelativeTime, getCurrentDate } from '@/utils/date';
 import dayjs from 'dayjs';
+import { useGetCouple } from '@/api/couples/getCouple';
+import LoadingSpinner from '@/components/loadingSpinner';
+import { useAddStarScope } from '@/api/couples/addStarScope';
 
 interface Comment {
   id: number;
@@ -16,6 +19,7 @@ interface Comment {
 }
 
 interface RankingDetailProps {
+  coupleId?: number;
   coupleName?: string;
   person1?: {
     name: string;
@@ -31,7 +35,7 @@ interface RankingDetailProps {
   rating?: number;
   heartRateScore?: number;
   temperatureScore?: number;
-  mbtiCompatibility?: string;
+  mbtiCompatibility?: number;
 }
 
 const RankingDetail: React.FC<RankingDetailProps> = props => {
@@ -39,47 +43,72 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
   const location = useLocation();
   const locationState = location.state as RankingDetailProps | null;
   const { showAlert } = useAlert();
+  const addStarScopeMutation = useAddStarScope();
 
-  const coupleName =
-    props.coupleName || locationState?.coupleName || '둠칫냐옹';
-  const person1 = props.person1 ||
-    locationState?.person1 || {
-      name: '이원희',
-      mbti: 'ISFP',
-      image: normalProfile,
-    };
-  const person2 = props.person2 ||
-    locationState?.person2 || {
-      name: '이로하',
-      mbti: 'INFJ',
-      image: normalProfile,
-    };
-  const score = props.score || locationState?.score || 99;
-  const rating = props.rating || locationState?.rating || 4;
+  const coupleId = props.coupleId || locationState?.coupleId;
+  const { data, isLoading, isError } = useGetCouple({
+    couple_id: coupleId || 0,
+  });
+
+  useEffect(() => {
+    if (isError || (!isLoading && !data && !coupleId)) {
+      showAlert(
+        '데이터를 불러오는데 실패했습니다.',
+        '잠시 후 다시 시도해주세요.',
+        () => {
+          navigate('/ranking');
+        }
+      );
+    }
+  }, [isError, isLoading, data, coupleId, navigate, showAlert]);
+
+  // API 데이터 또는 fallback 사용
+  const coupleName = data
+    ? `${data.user_a.username} & ${data.user_b.username}`
+    : props.coupleName || locationState?.coupleName || '둠칫냐옹';
+
+  const person1 = data
+    ? {
+        name: data.user_a.username,
+        mbti: data.user_a.mbti,
+        image: data.user_a.profile_image_url || normalProfile,
+      }
+    : props.person1 ||
+      locationState?.person1 || {
+        name: '이원희',
+        mbti: 'ISFP',
+        image: normalProfile,
+      };
+
+  const person2 = data
+    ? {
+        name: data.user_b.username,
+        mbti: data.user_b.mbti,
+        image: data.user_b.profile_image_url || normalProfile,
+      }
+    : props.person2 ||
+      locationState?.person2 || {
+        name: '이로하',
+        mbti: 'INFJ',
+        image: normalProfile,
+      };
+
+  const score = data?.score || props.score || locationState?.score || 99;
+  const rating =
+    data?.average_rating || props.rating || locationState?.rating || 4;
+
+  // 센서 데이터는 API에서 제공하지 않으므로 기존 방식 유지
   const heartRateScore =
     props.heartRateScore || locationState?.heartRateScore || 99;
   const temperatureScore =
     props.temperatureScore || locationState?.temperatureScore || 88;
   const mbtiCompatibility =
-    props.mbtiCompatibility || locationState?.mbtiCompatibility || '매우 좋은';
+    props.mbtiCompatibility || locationState?.mbtiCompatibility || 95;
 
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState<Comment[]>([
-    {
-      id: 1,
-      rating: 4,
-      text: '천진난만한 이런 기분도 신이 나서 날아갈 정도로 웃었던 날도 사랑스럽고 소중하게 피울 수 있도록 ㅠㅠ\n너무 귀엽다!!',
-      createdAt: dayjs().subtract(1, 'day').toISOString(),
-    },
-    {
-      id: 2,
-      rating: 4,
-      text: '꿍실 냐옹',
-      createdAt: dayjs().subtract(2, 'minute').toISOString(),
-    },
-  ]);
+  const [comments, setComments] = useState<Comment[]>([]);
 
   const handleBack = () => {
     navigate('/ranking');
@@ -98,15 +127,26 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
       showAlert('댓글을 작성해주세요.');
       return;
     }
+    addStarScopeMutation.mutate(
+      {
+        couple_id: coupleId,
+        rating: rating,
+        comment: commentText,
+      },
+      {
+        onSuccess: () => {
+          const newComment: Comment = {
+            id: comments.length + 1,
+            rating: userRating,
+            text: commentText,
+            createdAt: getCurrentDate(),
+          };
+          setComments([newComment, ...comments]);
+        },
+        onError: () => showAlert('댓글이 등록되지 않았습니다.'),
+      }
+    );
 
-    const newComment: Comment = {
-      id: comments.length + 1,
-      rating: userRating,
-      text: commentText,
-      createdAt: getCurrentDate(),
-    };
-
-    setComments([newComment, ...comments]);
     setUserRating(0);
     setCommentText('');
   };
@@ -168,8 +208,8 @@ const RankingDetail: React.FC<RankingDetailProps> = props => {
             </_.AnalysisText>
             <_.AnalysisText>
               {person1.name} 님과 {person2.name} 님은{' '}
-              <_.Highlight>MBTI</_.Highlight>의 궁합이 {mbtiCompatibility}{' '}
-              편입니다!
+              <_.Highlight>MBTI</_.Highlight>는 {mbtiCompatibility}%로
+              유사했습니다!
             </_.AnalysisText>
           </_.AnalysisBox>
         </_.AnalysisSection>
