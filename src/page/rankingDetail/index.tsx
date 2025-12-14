@@ -6,16 +6,9 @@ import sendBtn from '@/assets/sendBtnActive.svg';
 import Button from '@/components/button';
 import { useAlert } from '@/contexts/AlertContext';
 import { formatRelativeTime, getCurrentDate } from '@/utils/date';
-import { useGetCouple } from '@/api/couples/getCouple';
+import { useGetCouple, type Rating } from '@/api/couples/getCouple';
 import LoadingSpinner from '@/components/loadingSpinner';
 import { useAddStarScope } from '@/api/couples/addStarScope';
-
-interface Comment {
-  rating: number;
-  comment: string;
-  created_at: string;
-  nickname: string;
-}
 
 interface LocationState {
   coupleId?: number;
@@ -83,14 +76,13 @@ const RankingDetail: React.FC = () => {
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState<Comment[]>([]);
 
-  // API 데이터에서 기존 댓글 로드
-  useEffect(() => {
-    if (data?.ratings_list) {
-      setComments(data.ratings_list);
-    }
-  }, [data]);
+  // API 데이터에서 직접 댓글 사용 (로컬 상태 제거)
+  const existingComments = data?.ratings_list || [];
+  const [newComments, setNewComments] = useState<Rating[]>([]);
+
+  // 전체 댓글 목록 (새 댓글 + 기존 댓글)
+  const comments = [...newComments, ...existingComments];
 
   const handleBack = () => {
     navigate('/ranking');
@@ -122,13 +114,13 @@ const RankingDetail: React.FC = () => {
       },
       {
         onSuccess: () => {
-          const newComment: Comment = {
+          const newComment: Rating = {
             rating: userRating,
             comment: commentText,
             created_at: getCurrentDate(),
             nickname: '익명',
           };
-          setComments([newComment, ...comments]);
+          setNewComments([newComment, ...newComments]);
           setUserRating(0);
           setCommentText('');
           showAlert('댓글이 등록되었습니다.');
