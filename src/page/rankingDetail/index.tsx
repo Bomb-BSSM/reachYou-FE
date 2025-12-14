@@ -11,10 +11,10 @@ import LoadingSpinner from '@/components/loadingSpinner';
 import { useAddStarScope } from '@/api/couples/addStarScope';
 
 interface Comment {
-  id: number;
   rating: number;
-  text: string;
-  createdAt: string;
+  comment: string;
+  created_at: string;
+  nickname: string;
 }
 
 interface LocationState {
@@ -85,6 +85,13 @@ const RankingDetail: React.FC = () => {
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
 
+  // API 데이터에서 기존 댓글 로드
+  useEffect(() => {
+    if (data?.ratings_list) {
+      setComments(data.ratings_list);
+    }
+  }, [data]);
+
   const handleBack = () => {
     navigate('/ranking');
   };
@@ -116,19 +123,21 @@ const RankingDetail: React.FC = () => {
       {
         onSuccess: () => {
           const newComment: Comment = {
-            id: comments.length + 1,
             rating: userRating,
-            text: commentText,
-            createdAt: getCurrentDate(),
+            comment: commentText,
+            created_at: getCurrentDate(),
+            nickname: '익명',
           };
           setComments([newComment, ...comments]);
+          setUserRating(0);
+          setCommentText('');
+          showAlert('댓글이 등록되었습니다.');
         },
-        onError: () => showAlert('댓글이 등록되지 않습니다.'),
+        onError: () => {
+          showAlert('댓글 등록에 실패했습니다.');
+        },
       }
     );
-
-    setUserRating(0);
-    setCommentText('');
   };
 
   if (isLoading) {
@@ -245,18 +254,21 @@ const RankingDetail: React.FC = () => {
           </_.CommentInputBox>
 
           <_.CommentList>
-            {comments.map(comment => (
-              <_.CommentCard key={comment.id}>
-                <_.CommentStars>
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <_.Star key={star} filled={star <= comment.rating}>
-                      ★
-                    </_.Star>
-                  ))}
-                </_.CommentStars>
-                <_.CommentText>{comment.text}</_.CommentText>
+            {comments.map((comment, index) => (
+              <_.CommentCard key={`${comment.created_at}-${index}`}>
+                <_.CommentHeader>
+                  <_.CommentStars>
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <_.Star key={star} filled={star <= comment.rating}>
+                        ★
+                      </_.Star>
+                    ))}
+                  </_.CommentStars>
+                  <_.CommentNickname>{comment.nickname}</_.CommentNickname>
+                </_.CommentHeader>
+                <_.CommentContent>{comment.comment}</_.CommentContent>
                 <_.CommentTime>
-                  {formatRelativeTime(comment.createdAt)}
+                  {formatRelativeTime(comment.created_at)}
                 </_.CommentTime>
               </_.CommentCard>
             ))}

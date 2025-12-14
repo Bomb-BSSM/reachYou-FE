@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
+import CaptureButton from '@/components/captureButton';
 import NormalPofileImg from '@/assets/normalProfileImg.svg';
 import HeartBackground from '@/assets/heartBackground.svg';
 import { useNavigate } from 'react-router-dom';
@@ -8,11 +9,13 @@ import { useProfiles } from '@/contexts/UserContext';
 import { useCalculateCompatibility } from '@/api/compatibility/calculateCompatibility';
 import LoadingSpinner from '@/components/loadingSpinner';
 import { useAlert } from '@/contexts/AlertContext';
+import { useCaptureScreen } from '@/hooks/useCaptureScreen';
 
 const Result: React.FC = () => {
   const navigate = useNavigate();
   const { profiles, clearProfiles } = useProfiles();
   const { showAlert } = useAlert();
+  const { captureScreen, isCapturing } = useCaptureScreen();
   const calculateCompatibilityMutation = useCalculateCompatibility();
 
   const [compatibilityData, setCompatibilityData] = useState<{
@@ -65,6 +68,13 @@ const Result: React.FC = () => {
     navigate('/');
   };
 
+  const handleCapture = () => {
+    captureScreen('compatibility-result-container', {
+      fileName: `reachyou-궁합-결과-${new Date().getTime()}.png`,
+      ignoreElements: ['[data-capture-ignore="true"]'],
+    });
+  };
+
   const handleConfess = () => {
     if (!compatibilityData || !profile1 || !profile2) return;
 
@@ -105,8 +115,9 @@ const Result: React.FC = () => {
   }
 
   return (
-    <_.Container>
+    <_.Container id="compatibility-result-container">
       <_.HeartBackground src={HeartBackground} />
+      <CaptureButton onClick={handleCapture} isCapturing={isCapturing} />
 
       <_.ContentWrapper>
         <_.MainHeader>

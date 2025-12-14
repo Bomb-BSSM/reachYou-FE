@@ -1,18 +1,21 @@
 import React, { useEffect } from 'react';
 import * as _ from './style';
 import Button from '@/components/button';
+import CaptureButton from '@/components/captureButton';
 import NormalProfileImg from '@/assets/normalProfileImg.svg';
 import HeartBackground from '@/assets/heartBackground.svg';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useGetFinderDestiny } from '@/api/findDestiny/getFindDestiny';
 import LoadingSpinner from '@/components/loadingSpinner';
 import { useAlert } from '@/contexts/AlertContext';
+import { useCaptureScreen } from '@/hooks/useCaptureScreen';
 
 const DestinyResult: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const userId = location.state?.userId;
   const { showAlert } = useAlert();
+  const { captureScreen, isCapturing } = useCaptureScreen();
 
   const { data, isLoading, isError } = useGetFinderDestiny({ user_id: userId });
 
@@ -26,6 +29,13 @@ const DestinyResult: React.FC = () => {
 
   const handleBack = () => {
     navigate('/destiny-finder/list');
+  };
+
+  const handleCapture = () => {
+    captureScreen('destiny-result-container', {
+      fileName: `reachyou-운명찾기-결과-${new Date().getTime()}.png`,
+      ignoreElements: ['[data-capture-ignore="true"]'],
+    });
   };
 
   if (isLoading || isError || !data) {
@@ -58,8 +68,9 @@ const DestinyResult: React.FC = () => {
   }
 
   return (
-    <_.Container>
+    <_.Container id="destiny-result-container">
       <_.HeartBackground src={HeartBackground} />
+      <CaptureButton onClick={handleCapture} isCapturing={isCapturing} />
 
       <_.ContentWrapper>
         <_.MainHeader>
