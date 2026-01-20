@@ -6,16 +6,9 @@ import sendBtn from '@/assets/sendBtnActive.svg';
 import Button from '@/components/button';
 import { useAlert } from '@/contexts/AlertContext';
 import { formatRelativeTime, getCurrentDate } from '@/utils/date';
-import { useGetCouple } from '@/api/couples/getCouple';
+import { useGetCouple, type Rating } from '@/api/couples/getCouple';
 import LoadingSpinner from '@/components/loadingSpinner';
 import { useAddStarScope } from '@/api/couples/addStarScope';
-
-interface Comment {
-  id: number;
-  rating: number;
-  text: string;
-  createdAt: string;
-}
 
 interface LocationState {
   coupleId?: number;
@@ -83,7 +76,13 @@ const RankingDetail: React.FC = () => {
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState<Comment[]>([]);
+
+  // API 데이터에서 직접 댓글 사용 (로컬 상태 제거)
+  const existingComments = data?.ratings_list || [];
+  const [newComments, setNewComments] = useState<Rating[]>([]);
+
+  // 전체 댓글 목록 (새 댓글 + 기존 댓글)
+  const comments = [...newComments, ...existingComments];
 
   const handleBack = () => {
     navigate('/ranking');
@@ -115,20 +114,22 @@ const RankingDetail: React.FC = () => {
       },
       {
         onSuccess: () => {
-          const newComment: Comment = {
-            id: comments.length + 1,
+          const newComment: Rating = {
             rating: userRating,
-            text: commentText,
-            createdAt: getCurrentDate(),
+            comment: commentText,
+            created_at: getCurrentDate(),
+            nickname: '익명',
           };
-          setComments([newComment, ...comments]);
+          setNewComments([newComment, ...newComments]);
+          setUserRating(0);
+          setCommentText('');
+          showAlert('댓글이 등록되었습니다.');
         },
-        onError: () => showAlert('댓글이 등록되지 않습니다.'),
+        onError: () => {
+          showAlert('댓글 등록에 실패했습니다.');
+        },
       }
     );
-
-    setUserRating(0);
-    setCommentText('');
   };
 
   if (isLoading) {
@@ -245,18 +246,21 @@ const RankingDetail: React.FC = () => {
           </_.CommentInputBox>
 
           <_.CommentList>
-            {comments.map(comment => (
-              <_.CommentCard key={comment.id}>
-                <_.CommentStars>
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <_.Star key={star} filled={star <= comment.rating}>
-                      ★
-                    </_.Star>
-                  ))}
-                </_.CommentStars>
-                <_.CommentText>{comment.text}</_.CommentText>
+            {comments.map((comment, index) => (
+              <_.CommentCard key={`${comment.created_at}-${index}`}>
+                <_.CommentHeader>
+                  <_.CommentStars>
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <_.Star key={star} filled={star <= comment.rating}>
+                        ★
+                      </_.Star>
+                    ))}
+                  </_.CommentStars>
+                  <_.CommentNickname>{comment.nickname}</_.CommentNickname>
+                </_.CommentHeader>
+                <_.CommentContent>{comment.comment}</_.CommentContent>
                 <_.CommentTime>
-                  {formatRelativeTime(comment.createdAt)}
+                  {formatRelativeTime(comment.created_at)}
                 </_.CommentTime>
               </_.CommentCard>
             ))}

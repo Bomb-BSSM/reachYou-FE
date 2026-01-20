@@ -38,8 +38,6 @@ const HeartRateMeasure = () => {
   const [heartRate, setHeartRate] = useState(0);
   const [temperature, setTemperature] = useState(0);
   const [shouldUseMockData, setShouldUseMockData] = useState(false);
-  const [allMeasurementsCompleted, setAllMeasurementsCompleted] =
-    useState(false);
   const mockDataTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentProfile = profiles[currentProfileIndex];
@@ -162,84 +160,55 @@ const HeartRateMeasure = () => {
         setShouldUseMockData(false);
         disconnect();
       } else {
+        // 모든 측정 완료 - 바로 결과 페이지로 이동
         disconnect();
-        setAllMeasurementsCompleted(true);
+        navigate('/result');
       }
     }
   };
 
-  const handleViewResult = () => {
-    navigate('/result');
-  };
-
   return (
     <_.Container>
-      {allMeasurementsCompleted ? (
-        <>
-          <_.MainHeader>
-            <_.HeaderTextArea>
-              <_.HeaderText color="black">측정이 완료되었습니다!</_.HeaderText>
-            </_.HeaderTextArea>
-            <Button body="궁합 보기" type="pink" onClick={handleViewResult} />
-          </_.MainHeader>
+      <_.MainHeader>
+        <_.HeaderTextArea>
+          <_.HeaderText color="pink">
+            Q{currentProfileIndex + 1}.
+          </_.HeaderText>
+          <_.HeaderText color="black">
+            {currentProfile?.username}님의 심박수와 체온을 측정해 주세요.
+          </_.HeaderText>
+        </_.HeaderTextArea>
+        <Button
+          body={
+            isSingleMeasurement
+              ? '완료'
+              : currentProfileIndex < profiles.length - 1
+                ? '다음으로'
+                : '완료'
+          }
+          type="pink"
+          onClick={handleNext}
+          disabled={measurementStatus !== 'completed'}
+        />
+      </_.MainHeader>
 
-          <_.ResultCardsGrid>
-            {profiles.map(profile => (
-              <MeasurementCard
-                key={profile.user_id}
-                username={profile.username}
-                temperature={profile.temperature || 36.5}
-                heartRate={profile.heartRate || 99}
-                measurementStatus="completed"
-                showButton={false}
-              />
-            ))}
-          </_.ResultCardsGrid>
-        </>
-      ) : (
-        <>
-          <_.MainHeader>
-            <_.HeaderTextArea>
-              <_.HeaderText color="pink">
-                Q{currentProfileIndex + 1}.
-              </_.HeaderText>
-              <_.HeaderText color="black">
-                {currentProfile?.username}님의 심박수와 체온을 측정해 주세요.
-              </_.HeaderText>
-            </_.HeaderTextArea>
+      <_.ContentWrapper>
+        <MeasurementCard
+          temperature={temperature}
+          heartRate={heartRate}
+          measurementStatus={measurementStatus}
+        />
+
+        {measurementStatus === 'idle' && (
+          <_.StartButton>
             <Button
-              body={
-                isSingleMeasurement
-                  ? '완료'
-                  : currentProfileIndex < profiles.length - 1
-                    ? '다음으로'
-                    : '완료'
-              }
+              body="측정 시작"
               type="pink"
-              onClick={handleNext}
-              disabled={measurementStatus !== 'completed'}
+              onClick={handleStartMeasurement}
             />
-          </_.MainHeader>
-
-          <_.ContentWrapper>
-            <MeasurementCard
-              temperature={temperature}
-              heartRate={heartRate}
-              measurementStatus={measurementStatus}
-            />
-
-            {measurementStatus === 'idle' && (
-              <_.StartButton>
-                <Button
-                  body="측정 시작"
-                  type="pink"
-                  onClick={handleStartMeasurement}
-                />
-              </_.StartButton>
-            )}
-          </_.ContentWrapper>
-        </>
-      )}
+          </_.StartButton>
+        )}
+      </_.ContentWrapper>
     </_.Container>
   );
 };

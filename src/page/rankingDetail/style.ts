@@ -264,11 +264,26 @@ export const CommentCard = styled.div`
   border-radius: 12px;
 `;
 
+export const CommentHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+`;
+
 export const CommentStars = styled.div`
   display: flex;
   align-items: center;
   gap: 2px;
   height: 18px;
+`;
+
+export const CommentNickname = styled.span`
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.g400};
+  white-space: nowrap;
 `;
 
 export const Star = styled.span<{ filled: boolean }>`
@@ -286,6 +301,18 @@ export const CommentText = styled.p`
   letter-spacing: 0.56px;
   margin: 0;
   white-space: pre-wrap;
+`;
+
+export const CommentContent = styled.p`
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text};
+  line-height: 1.5;
+  letter-spacing: 0.56px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 export const CommentTime = styled.p`

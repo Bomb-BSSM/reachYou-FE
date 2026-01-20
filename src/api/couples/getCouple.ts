@@ -8,17 +8,11 @@ interface UserInfo {
   profile_image_url: string;
 }
 
-interface RatingUser {
-  user_id: number;
-  username: string;
-  profile_image_url: string;
-}
-
-interface Rating {
+export interface Rating {
   rating: number;
   comment: string;
   created_at: string;
-  user: RatingUser;
+  nickname: string;
 }
 
 interface CoupleResponse {
